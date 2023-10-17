@@ -14,6 +14,14 @@ class Scanner {
         int current = 0;
         int line = 1;
 
+        bool isAtEnd(){
+            return current >= source.length();
+        }
+
+        void scanToken(){
+            
+        }
+
     public:
         Scanner(string source){
             this->source = source;
