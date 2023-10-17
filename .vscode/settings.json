@@ -1,0 +1,15 @@
+{
+    "files.associations": {
+        "__tuple": "cpp",
+        "chrono": "cpp",
+        "compare": "cpp",
+        "cstddef": "cpp",
+        "filesystem": "cpp",
+        "limits": "cpp",
+        "ratio": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "variant": "cpp",
+        "iosfwd": "cpp"
+    }
+}
