@@ -14,6 +14,8 @@ class Scanner {
         int current = 0;
         int line = 1;
 
+        static const unordered_map<string, TokenType> keywords;
+
         bool isAtEnd(){
             return current >= source.length();
         }
@@ -29,6 +31,16 @@ class Scanner {
         void addToken(TokenType type, string literal) {
             string text = source.substr(start, current);
             tokens.push_back(Token(type, text, literal, line));
+        }
+
+        bool isAlpha(char c) {
+            return (c >= 'a' && c <= 'z') ||
+                (c >= 'A' && c <= 'Z') ||
+                    c == '_';
+        }
+
+        bool isAlphaNumeric(char c) {
+            return isAlpha(c) || isdigit(c);
         }
 
         bool match(char expected) {
@@ -69,20 +81,33 @@ class Scanner {
         }
 
         void number(){
-            while (isdigit(peek())) {advance()};
+            while (isdigit(peek())) {
+                advance();
+            }
 
             // Look for a fractional part.
             if (peek() == '.' && isdigit(peekNext())) {
-            // Consume the "."
-            advance();
+                // Consume the "."
+                advance();
 
                 while (isdigit(peek())) advance();
             }
 
             addToken(
                 NUMBER,
-                stod(source.substr(start, current))
+                source.substr(start, current)
             );
+        }
+
+        void identifier(){
+            while (isAlphaNumeric(peek())){ advance();}
+
+            string text = source.substr(start, current);
+            if (keywords.find(text) != keywords.end()){
+                addToken(keywords[text]);
+            } else {
+                addToken(IDENTIFIER);
+            }
         }
 
         void scanToken(){
@@ -136,9 +161,10 @@ class Scanner {
                 default:
                     if (isdigit(c)){
                         number();
+                    } else if (isAlpha(c)){
+                        identifier();
                     } else {
-                        // Lox.error(line, "Unexpected character."); // todo: fix this. probably put error() and repor() in another file and import here
-
+                        Lox.error(line, "Unexpected character."); // todo: fix this. probably put error() and report() in another file and import here
                     }
                     break;
             }
@@ -147,7 +173,7 @@ class Scanner {
     public:
         Scanner (string source) {
             this->source = source;
-        };
+        }
 
         vector<Token> scanTokens() {
             while (!isAtEnd()) {
@@ -159,4 +185,23 @@ class Scanner {
             tokens.push_back(Token(END_OF_FILE, "", NULL, line));
             return tokens;
         };
+};
+
+const unordered_map<string, TokenType> Scanner::keywords = {
+    {"and", AND},
+    {"class", CLASS},
+    {"else", ELSE}, 
+    {"false", FALSE}, 
+    {"for", FOR}, 
+    {"fun", FUN}, 
+    {"if", IF}, 
+    {"nil", NIL}, 
+    {"or", OR}, 
+    {"print", PRINT}, 
+    {"return", RETURN}, 
+    {"super", SUPER}, 
+    {"this", THIS}, 
+    {"true", TRUE}, 
+    {"var", VAR}, 
+    {"while", WHILE}
 };
