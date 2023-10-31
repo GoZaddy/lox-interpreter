@@ -1,6 +1,9 @@
+#include "token.h"
+
 #include <sstream>
 
-#include "token.h"
+
+using namespace std;
 
 
 Token::Token(TokenType type, string lexeme, string literal, int line) {

@@ -1,10 +1,9 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 
-
 #include <string>
 
-using namespace std;
+
 
 enum TokenType {
   // Single-character tokens.
@@ -31,12 +30,12 @@ enum TokenType {
 class Token {
     public:
         TokenType type;
-        string lexeme;
-        string literal;
+        std::string lexeme;
+        std::string literal;
         int line;
 
-        Token(TokenType type, string lexeme, string literal, int line);
-        string toString();
+        Token(TokenType type, std::string lexeme, std::string literal, int line);
+        std::string toString();
 };
 
 #endif

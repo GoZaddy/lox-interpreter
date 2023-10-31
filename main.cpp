@@ -2,28 +2,30 @@
 #include <fstream>
 #include <sstream>
 
+#include "scanner.h"
+
 using namespace std;
 
 bool hadError = false;
  
-void run(string code){
+void run(string source){
     // get tokens
+    Scanner scanner(source);
+    vector<Token> tokens = scanner.scanTokens();
+
+    // For now, just print the tokens.
+    for (Token token : tokens) {
+      cout << token.toString() << endl;
+    }
 }
 
-void error(int line, string message){
-    report(line, "", message);
-}
-
-void report(int line, string where, string message){
-    cerr << "[line " << line << "] Error" << where << ": " << message;
-}
 
 int runFile(string path){
     ifstream fileStream;
     fileStream.open(path);
     if (!fileStream.is_open()){
         cout << "Could not open file: " << path << endl;
-        return;
+        return 74;
     }
 
     stringstream buffer;
@@ -31,10 +33,12 @@ int runFile(string path){
 
     run(buffer.str());
     if (hadError) return 65;
+
+    return 0;
 }
 
-int runPrompt(){
-    string line;
+void runPrompt(){
+    string line = "";
     while(!cin.eof()){
         cout << "> " << endl;
         getline(cin, line);
@@ -46,12 +50,13 @@ int runPrompt(){
 
 
 int main(int argc, char *argv[]){
-    if (argc > 1){
+    if (argc > 2){
         return 64;  // https://man.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
-    } else if (argc == 1){
+    } else if (argc == 2){
         return runFile(argv[0]);
     } else {
-        return runPrompt();
+        runPrompt();
+        
     }
 
     return 0;
