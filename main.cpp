@@ -29,9 +29,13 @@ int runFile(string path){
     }
 
     stringstream buffer;
+
     buffer << fileStream.rdbuf();
 
-    run(buffer.str());
+    string fileContent = buffer.str();
+
+    run(fileContent);
+    
     if (hadError) return 65;
 
     return 0;
@@ -53,7 +57,7 @@ int main(int argc, char *argv[]){
     if (argc > 2){
         return 64;  // https://man.freebsd.org/cgi/man.cgi?query=sysexits&apropos=0&sektion=0&manpath=FreeBSD+4.3-RELEASE&format=html
     } else if (argc == 2){
-        return runFile(argv[0]);
+        return runFile(argv[1]);
     } else {
         runPrompt();
         
