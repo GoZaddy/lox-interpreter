@@ -35,6 +35,7 @@ class Token {
         int line;
 
         Token(TokenType type, std::string lexeme, std::string literal, int line);
+        Token() = default;
         std::string toString();
 };
 
