@@ -99,7 +99,7 @@ void Scanner::stringFunc() {
     }
 
     if (isAtEnd()) {
-        // Lox.error(line, "Unterminated string.");
+        Util::error(line, "Unterminated string.");
         return;
     }
 
