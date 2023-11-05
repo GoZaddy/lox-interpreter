@@ -40,6 +40,9 @@ void defineType(
         helper << currLine;
         helper >> currType >> currFieldName;
         helper.clear();
+        if (currType == baseName){
+            currType += "<T>*";
+        }
         processedFields.push_back(std::make_pair(currType, currFieldName));
     }
 
@@ -49,8 +52,8 @@ void defineType(
     //     cout << fieldVal.first << "------" << fieldVal.second << endl;
     // }
 
-    
-    fileStream << "class " << className << ": public " << baseName << "{" << endl;
+    fileStream << "template <typename T>" << endl;
+    fileStream << "class " << className << ": public " << baseName << "<T> {" << endl;
 
     fileStream << "\tpublic:" << endl;
 
@@ -77,7 +80,15 @@ void defineType(
         std::pair<string, string> fieldVal = processedFields[i];
         fileStream << "\t\t\t" << "this->" << fieldVal.second << " = " << fieldVal.second << ";" << endl;
     }
-    fileStream << "\t\t" << "}" << endl;
+    fileStream << "\t\t}" << endl;
+
+    // overriding accept() method
+    fileStream << endl;
+    fileStream << "\t\tT accept(Visitor<T>* visitor) {" << endl;
+    fileStream << "\t\t\treturn visitor->visit" << "(this);" << endl;
+    fileStream << "\t\t}" << endl;
+
+
 
     fileStream << "};" << endl << endl;
 
@@ -93,6 +104,7 @@ void defineVisitor(
     fileStream << "// visitor interface" << endl;
     fileStream << "template <typename T>" << endl;
     fileStream << "class Visitor {" << endl;
+    fileStream << "\tpublic:" << endl;
 
     for (auto type : subtypes){
         int colonIndex = type.find(':');
@@ -100,8 +112,8 @@ void defineVisitor(
         string typeName;
         helperStream >> typeName;
 
-        fileStream << "\tT visit" << typeName << baseName 
-            << "(" << typeName << " " << lowercase(baseName) << ") = 0;" << endl;
+        fileStream << "\t\tvirtual T visit"
+            << "(" << typeName << "<T>* " << lowercase(baseName) << ") = 0;" << endl;
     }
 
     fileStream << "};" << endl << endl;
@@ -124,7 +136,7 @@ void defineAst(
     string baseName, 
     std::vector<string>& subtypes
 ){
-    string path = outputDir + "/" + baseName + ".cpp";
+    string path = outputDir + "/" + lowercase(baseName) + ".cpp";
     ofstream fileStream;
     fileStream.open(path);
     if (!fileStream.is_open()){
@@ -133,15 +145,19 @@ void defineAst(
     }
 
     stringstream helperStream;
+    
 
     fileStream << "#include <string>" << endl;
     fileStream << "#include \"token.h\"" << endl;
     fileStream << "using namespace std;" << endl << endl;
 
-    fileStream << "class " << baseName << " {" << endl;
-    fileStream << "};" << endl << endl;
+    // forward declaration to deal with circular dependencies
+    fileStream << "template <typename T>" << endl;
+    fileStream << "class " << baseName << ";" << endl << endl;
 
-    defineVisitor(fileStream, baseName, subtypes);
+    fileStream << "template <typename T>" << endl;
+    fileStream << "class Visitor;" << endl << endl << endl;
+
 
     for (auto type : subtypes){
         int colonIndex = type.find(':');
@@ -151,6 +167,14 @@ void defineAst(
         string fields = type.substr(colonIndex+1, type.size()-colonIndex-1);
         defineType(fileStream, baseName, className, fields);
     }
+
+    defineVisitor(fileStream, baseName, subtypes);
+
+    fileStream << "template <typename T>" << endl;
+    fileStream << "class " << baseName << " {" << endl;
+    fileStream << "\tpublic:" << endl;
+    fileStream << "\t\tvirtual T accept(Visitor<T>* visitor) = 0;" << endl;
+    fileStream << "};" << endl << endl;
 
     
     fileStream.close();

@@ -41,7 +41,7 @@ vector<Token> Scanner::scanTokens() {
     }
 
 
-    // tokens.push_back(Token(END_OF_FILE, "", NULL, line));
+    tokens.push_back(Token(END_OF_FILE, "", "", line));
 
     return tokens;
 };
@@ -196,7 +196,7 @@ void Scanner::scanToken(){
             } else if (isAlpha(c)){
                 identifier();
             } else {
-                Util::error(line, "Unexpected character."); // todo: fix this. probably put error() and report() in another file and import here
+                Util::error(line, "Unexpected character.");
             }
             break;
     }

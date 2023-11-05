@@ -2,53 +2,84 @@
 #include "token.h"
 using namespace std;
 
-class Expr {
-};
-
-// visitor interface
 template <typename T>
-class Visitor {
-	T visitBinaryExpr(Binary expr) = 0;
-	T visitGroupingExpr(Grouping expr) = 0;
-	T visitLiteralExpr(Literal expr) = 0;
-	T visitUnaryExpr(Unary expr) = 0;
-}
+class Expr;
 
-class Binary: public Expr{
+template <typename T>
+class Visitor;
+
+
+template <typename T>
+class Binary: public Expr<T> {
 	public:
-		Expr left;
+		Expr<T>* left;
 		Token operatorToken;
-		Expr right;
-		Binary(Expr left, Token operatorToken, Expr right) {
+		Expr<T>* right;
+		Binary(Expr<T>* left, Token operatorToken, Expr<T>* right) {
 			this->left = left;
 			this->operatorToken = operatorToken;
 			this->right = right;
 		}
-};
 
-class Grouping: public Expr{
-	public:
-		Expr expression;
-		Grouping(Expr expression) {
-			this->expression = expression;
+		T accept(Visitor<T>* visitor) {
+			return visitor->visit(this);
 		}
 };
 
-class Literal: public Expr{
+template <typename T>
+class Grouping: public Expr<T> {
+	public:
+		Expr<T>* expression;
+		Grouping(Expr<T>* expression) {
+			this->expression = expression;
+		}
+
+		T accept(Visitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+};
+
+template <typename T>
+class Literal: public Expr<T> {
 	public:
 		string value;
 		Literal(string value) {
 			this->value = value;
 		}
+
+		T accept(Visitor<T>* visitor) {
+			return visitor->visit(this);
+		}
 };
 
-class Unary: public Expr{
+template <typename T>
+class Unary: public Expr<T> {
 	public:
 		Token operatorToken;
-		Expr right;
-		Unary(Token operatorToken, Expr right) {
+		Expr<T>* right;
+		Unary(Token operatorToken, Expr<T>* right) {
 			this->operatorToken = operatorToken;
 			this->right = right;
 		}
+
+		T accept(Visitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+};
+
+// visitor interface
+template <typename T>
+class Visitor {
+	public:
+		virtual T visit(Binary<T>* expr) = 0;
+		virtual T visit(Grouping<T>* expr) = 0;
+		virtual T visit(Literal<T>* expr) = 0;
+		virtual T visit(Unary<T>* expr) = 0;
+};
+
+template <typename T>
+class Expr {
+	public:
+		virtual T accept(Visitor<T>* visitor) = 0;
 };
 
