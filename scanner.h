@@ -11,7 +11,7 @@
 
 #include "token.h"
 
-using namespace std;
+using namespace std; // todo: remove - bad practice
 
 class Scanner {
     public:

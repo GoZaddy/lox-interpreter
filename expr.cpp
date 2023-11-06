@@ -1,3 +1,5 @@
+#ifndef EXPR
+#define EXPR
 #include <string>
 #include "token.h"
 using namespace std;
@@ -8,6 +10,10 @@ class Expr;
 template <typename T>
 class Visitor;
 
+
+namespace LiteralTypeNS {
+	enum LiteralType { NUMBER, STRING, TRUE, FALSE, NIL };
+};
 
 template <typename T>
 class Binary: public Expr<T> {
@@ -43,8 +49,10 @@ template <typename T>
 class Literal: public Expr<T> {
 	public:
 		string value;
-		Literal(string value) {
+		LiteralTypeNS::LiteralType type;
+		Literal(string value, LiteralTypeNS::LiteralType type) {
 			this->value = value;
+			this->type = type;
 		}
 
 		T accept(Visitor<T>* visitor) {
@@ -83,3 +91,4 @@ class Expr {
 		virtual T accept(Visitor<T>* visitor) = 0;
 };
 
+#endif

@@ -17,6 +17,21 @@ string lowercase(string input){
     return result;
 }
 
+string uppercase(string input){
+    string result;
+    for(int i = 0; i < input.size(); ++i){
+        result += toupper(input[i]);
+    }
+
+    return result;
+}
+
+void defineLiteralTypeEnums(ofstream& fileStream){
+    fileStream << "namespace LiteralTypeNS {" << endl;
+    fileStream << "\tenum LiteralType { NUMBER, STRING, TRUE, FALSE, NIL };" << endl;
+    fileStream << "};" << endl << endl;
+}
+
 
 void defineType(
     ofstream& fileStream, 
@@ -117,18 +132,6 @@ void defineVisitor(
     }
 
     fileStream << "};" << endl << endl;
-    
-
-
-    // writer.println("  interface Visitor<R> {");
-
-    // for (String type : types) {
-    //   String typeName = type.split(":")[0].trim();
-    //   writer.println("    R visit" + typeName + baseName + "(" +
-    //       typeName + " " + baseName.toLowerCase() + ");");
-    // }
-
-    // writer.println("  }");
 }
 
 void defineAst(
@@ -146,6 +149,8 @@ void defineAst(
 
     stringstream helperStream;
     
+    fileStream << "#ifndef " << uppercase(baseName) << endl;
+    fileStream << "#define " << uppercase(baseName) << endl;
 
     fileStream << "#include <string>" << endl;
     fileStream << "#include \"token.h\"" << endl;
@@ -157,6 +162,9 @@ void defineAst(
 
     fileStream << "template <typename T>" << endl;
     fileStream << "class Visitor;" << endl << endl << endl;
+
+    // literal type enums
+    defineLiteralTypeEnums(fileStream);
 
 
     for (auto type : subtypes){
@@ -176,7 +184,7 @@ void defineAst(
     fileStream << "\t\tvirtual T accept(Visitor<T>* visitor) = 0;" << endl;
     fileStream << "};" << endl << endl;
 
-    
+    fileStream << "#endif" << endl;
     fileStream.close();
   }
 
@@ -191,7 +199,7 @@ int main(int argc, char *argv[]){
     vector<string> subtypes = {
       "Binary   : Expr left, Token operatorToken, Expr right",
       "Grouping : Expr expression",
-      "Literal  : string value",
+      "Literal  : string value, LiteralTypeNS::LiteralType type",
       "Unary    : Token operatorToken, Expr right"
     };
 

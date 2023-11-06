@@ -3,6 +3,8 @@
 #include <sstream>
 
 #include "scanner.h"
+#include "parser.cpp"
+#include "ast_printer.cpp"
 
 using namespace std;
 
@@ -13,10 +15,21 @@ void run(string source){
     Scanner scanner(source);
     vector<Token> tokens = scanner.scanTokens();
 
-    // For now, just print the tokens.
-    for (Token token : tokens) {
-      cout << token.toString() << endl;
-    }
+    // // For now, just print the tokens.
+    // for (Token token : tokens) {
+    //   cout << token.toString() << endl;
+    // }
+
+
+    Parser parser(tokens);
+
+    Exprv expression = parser.parse();
+
+    if (hadError) return;
+
+
+    AstPrinter asp;
+    cout << asp.print(expression) << endl;
 }
 
 
