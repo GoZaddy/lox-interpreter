@@ -5,10 +5,15 @@
 #include "scanner.h"
 #include "parser.cpp"
 #include "ast_printer.cpp"
+#include "util.h"
+#include "interpreter.cpp"
 
 using namespace std;
 
-bool hadError = false;
+bool Util::hadError = false;
+bool Util::hadRuntimeError = false;
+
+Interpreter::Interpreter interpreter;
  
 void run(string source){
     // get tokens
@@ -25,11 +30,13 @@ void run(string source){
 
     Exprv expression = parser.parse();
 
-    if (hadError) return;
+    if (Util::hadError) return;
 
 
-    AstPrinter asp;
-    cout << asp.print(expression) << endl;
+    // AstPrinter asp;
+    // cout << asp.print(expression) << endl;
+
+    interpreter.interpret(expression);
 }
 
 
@@ -49,7 +56,8 @@ int runFile(string path){
 
     run(fileContent);
     
-    if (hadError) return 65;
+    if (Util::hadError) return 65;
+    if (Util::hadRuntimeError) return 70;
 
     return 0;
 }
@@ -61,7 +69,7 @@ void runPrompt(){
         getline(cin, line);
 
         run(line);
-        hadError = false;
+        Util::hadError = false;
     }
 }
 

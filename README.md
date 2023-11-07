@@ -1,12 +1,10 @@
-# Chapter 6
+# Chapter 7
 maybe write note here
 
 # Run instructions
 ```
-g++ -std=c++11 main.cpp scanner.cpp token.cpp util.cpp ast_printer.cpp parser.cpp
+g++ -std=c++11 main.cpp scanner.cpp token.cpp util.cpp parser.cpp interpreter.cpp
 ```
 
-# Potential issues
-- In c++, I have to make use of pointers to take advantage of the visitor pattern(this is because C++ doesn't support interfaces as a distinct construct, instead I have to use an abstract class which requires pointers). Since, I have to create pointers to represent each expression, the interpreter will be creating lots of pointers which means we could theoretically run out of memory very quickly.
-
-Haven't really thought of a solution but I think instead of returning Exprv from my parsing functions, I could processing certain expressions as soon as possible and free the pointers, returning the results of the processing instead of the actual pointers themselves
+# What we learned
+i discovered that i had to store each token in its raw form - for example, storing the string "abc" as ""abc"" instead of "abc" since our interpreter visit methods return only strings and I cannot use some arbitrary class field to differentiate, for exmample, numbers and strings

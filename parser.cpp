@@ -143,30 +143,25 @@ class Parser {
         Exprv primary(){
             Exprv res;
             if (match({FALSE})) {
-                Litv* temp = new Litv("", LiteralTypeNS::FALSE);
+                Litv* temp = new Litv("false");
                 res = temp;
                 return res;
             }
 
             if (match({TRUE})) {
-                Litv* temp = new Litv("", LiteralTypeNS::TRUE);
+                Litv* temp = new Litv("true");
                 res = temp;
                 return res;
             }
 
             if (match({NIL})) {
-                Litv* temp = new Litv("", LiteralTypeNS::NIL);
+                Litv* temp = new Litv("nil");
                 res = temp;
                 return res;
             }
 
             if (match({NUMBER, STRING})) {
-                LiteralTypeNS::LiteralType lt;
-                
-                if (previous().type == NUMBER) lt = LiteralTypeNS::NUMBER;
-                if (previous().type == STRING) lt = LiteralTypeNS::STRING;
-
-                Litv* temp = new Litv(previous().literal, lt);
+                Litv* temp = new Litv(previous().literal);
                 res = temp;
 
                 return res;
@@ -182,6 +177,7 @@ class Parser {
             }
 
             throw parseError(peek(), "Expect expression");
+            return nullptr;
         }
 
         Token consume(TokenType type, string message){

@@ -11,10 +11,6 @@ template <typename T>
 class Visitor;
 
 
-namespace LiteralTypeNS {
-	enum LiteralType { NUMBER, STRING, TRUE, FALSE, NIL };
-};
-
 template <typename T>
 class Binary: public Expr<T> {
 	public:
@@ -49,10 +45,8 @@ template <typename T>
 class Literal: public Expr<T> {
 	public:
 		string value;
-		LiteralTypeNS::LiteralType type;
-		Literal(string value, LiteralTypeNS::LiteralType type) {
+		Literal(string value) {
 			this->value = value;
-			this->type = type;
 		}
 
 		T accept(Visitor<T>* visitor) {

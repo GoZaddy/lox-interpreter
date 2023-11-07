@@ -5,13 +5,21 @@
 #include "token.h"
 
 
-namespace Util {
-    void report(int line, std::string where, std::string message);
+class Util{
+    public:
+        static bool hadError;
+        static bool hadRuntimeError;
 
-    void error(int line, std::string message);
+        static void report(int line, std::string where, std::string message);
 
-    void error(Token token, std::string message);
-}
+        static void error(int line, std::string message);
 
+        static void error(Token token, std::string message);
+
+        static double doub(std::string input);
+
+        static std::string runtimeError(Token token, std::string message);
+
+};
 
 #endif

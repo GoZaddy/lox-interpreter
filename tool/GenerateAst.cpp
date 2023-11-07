@@ -26,12 +26,6 @@ string uppercase(string input){
     return result;
 }
 
-void defineLiteralTypeEnums(ofstream& fileStream){
-    fileStream << "namespace LiteralTypeNS {" << endl;
-    fileStream << "\tenum LiteralType { NUMBER, STRING, TRUE, FALSE, NIL };" << endl;
-    fileStream << "};" << endl << endl;
-}
-
 
 void defineType(
     ofstream& fileStream, 
@@ -163,8 +157,6 @@ void defineAst(
     fileStream << "template <typename T>" << endl;
     fileStream << "class Visitor;" << endl << endl << endl;
 
-    // literal type enums
-    defineLiteralTypeEnums(fileStream);
 
 
     for (auto type : subtypes){
@@ -199,7 +191,7 @@ int main(int argc, char *argv[]){
     vector<string> subtypes = {
       "Binary   : Expr left, Token operatorToken, Expr right",
       "Grouping : Expr expression",
-      "Literal  : string value, LiteralTypeNS::LiteralType type",
+      "Literal  : string value",
       "Unary    : Token operatorToken, Expr right"
     };
 

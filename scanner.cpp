@@ -107,7 +107,7 @@ void Scanner::stringFunc() {
     advance();
 
     // Trim the surrounding quotes.
-    string val = source.substr(start + 1, current - start - 2);
+    string val = source.substr(start, current - start);
     addToken(STRING, val);
 }
 
