@@ -49,9 +49,10 @@ void defineType(
         helper << currLine;
         helper >> currType >> currFieldName;
         helper.clear();
-        if (currType == baseName){
-            currType += "<T>*";
-        }
+        // TODO: removing this and moving the <T>* type prefix to the user input instead
+        // if (currType == baseName){
+        //     currType += "<T>*";
+        // }
         processedFields.push_back(std::make_pair(currType, currFieldName));
     }
 
@@ -93,7 +94,7 @@ void defineType(
 
     // overriding accept() method
     fileStream << endl;
-    fileStream << "\t\tT accept(Visitor<T>* visitor) {" << endl;
+    fileStream << "\t\tT accept(" << baseName << "Visitor<T>* visitor) {" << endl;
     fileStream << "\t\t\treturn visitor->visit" << "(this);" << endl;
     fileStream << "\t\t}" << endl;
 
@@ -112,7 +113,7 @@ void defineVisitor(
 
     fileStream << "// visitor interface" << endl;
     fileStream << "template <typename T>" << endl;
-    fileStream << "class Visitor {" << endl;
+    fileStream << "class " << baseName << "Visitor {" << endl;
     fileStream << "\tpublic:" << endl;
 
     for (auto type : subtypes){
@@ -131,7 +132,8 @@ void defineVisitor(
 void defineAst(
     string outputDir, 
     string baseName, 
-    std::vector<string>& subtypes
+    std::vector<string>& subtypes,
+    string beginningStatements = ""
 ){
     string path = outputDir + "/" + lowercase(baseName) + ".cpp";
     ofstream fileStream;
@@ -148,6 +150,7 @@ void defineAst(
 
     fileStream << "#include <string>" << endl;
     fileStream << "#include \"token.h\"" << endl;
+    fileStream << beginningStatements << endl;
     fileStream << "using namespace std;" << endl << endl;
 
     // forward declaration to deal with circular dependencies
@@ -155,7 +158,7 @@ void defineAst(
     fileStream << "class " << baseName << ";" << endl << endl;
 
     fileStream << "template <typename T>" << endl;
-    fileStream << "class Visitor;" << endl << endl << endl;
+    fileStream << "class " << baseName << "Visitor;" << endl << endl << endl;
 
 
 
@@ -173,7 +176,7 @@ void defineAst(
     fileStream << "template <typename T>" << endl;
     fileStream << "class " << baseName << " {" << endl;
     fileStream << "\tpublic:" << endl;
-    fileStream << "\t\tvirtual T accept(Visitor<T>* visitor) = 0;" << endl;
+    fileStream << "\t\tvirtual T accept(" << baseName << "Visitor<T>* visitor) = 0;" << endl;
     fileStream << "};" << endl << endl;
 
     fileStream << "#endif" << endl;
@@ -188,14 +191,26 @@ int main(int argc, char *argv[]){
 
     string outputdir = argv[1];
 
-    vector<string> subtypes = {
-      "Binary   : Expr left, Token operatorToken, Expr right",
-      "Grouping : Expr expression",
+    vector<string> expressionSubtypes = {
+      "Binary   : Expr<T>* left, Token operatorToken, Expr<T>* right",
+      "Grouping : Expr<T>* expression",
       "Literal  : string value",
-      "Unary    : Token operatorToken, Expr right"
+      "Unary    : Token operatorToken, Expr<T>* right"
     };
 
-    defineAst(outputdir, "Expr", subtypes);
+    defineAst(outputdir, "Expr", expressionSubtypes);
+
+
+    vector<string> statementSubtypes = {
+        "Expression : Expr<T>* expression",
+        "Print      : Expr<T>* expression"
+    };
+
+    defineAst(outputdir, "Stmt", statementSubtypes, "#include \"expr.cpp\"\n");
+
+
+    // statements
+
 
 
     return 0;

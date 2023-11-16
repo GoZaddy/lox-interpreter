@@ -28,7 +28,7 @@ void run(string source){
 
     Parser parser(tokens);
 
-    Exprv expression = parser.parse();
+    // Exprvp expression = parser.parse();
 
     if (Util::hadError) return;
 
@@ -36,7 +36,7 @@ void run(string source){
     // AstPrinter asp;
     // cout << asp.print(expression) << endl;
 
-    interpreter.interpret(expression);
+    // interpreter.interpret(expression);
 }
 
 

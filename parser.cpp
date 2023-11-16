@@ -7,13 +7,9 @@
 #include "token.h"
 #include "expr.cpp"
 #include "util.h"
+#include "stmt.cpp"
 
-
-typedef Expr<string>* Exprv;
-typedef Binary<string> Binv;
-typedef Unary<string> Unav;
-typedef Literal<string> Litv;
-typedef Grouping<string> Groupv;
+#include "types.h"
 
 class Parser {
     private:
@@ -60,16 +56,36 @@ class Parser {
             return "Parse Error occurred!";
         }
 
-        Exprv expression(){
+        Exprvp expression(){
             return equality();
         }
 
-        Exprv equality(){
-            Exprv expr = comparison();
+        Stmtvp statement() {
+            if (match({PRINT})) return printStatement();
+
+            return expressionStatement();
+        }
+
+        Stmtvp printStatement() {
+            Exprvp value = expression();
+            consume(SEMICOLON, "Expect ';' after value.");
+            Stmtvp stmt = new Printv(value);
+            return stmt;
+        }
+
+        Stmtvp expressionStatement() {
+            Exprvp expr = expression();
+            consume(SEMICOLON, "Expect ';' after expression.");
+            Stmtvp stmt = new Expressionv(expr);
+            return stmt;
+        }
+
+        Exprvp equality(){
+            Exprvp expr = comparison();
 
             while(match({BANG_EQUAL, EQUAL_EQUAL})){
                 Token operatorToken = previous();
-                Exprv right = comparison();
+                Exprvp right = comparison();
                 Binv* temp = new Binv(expr, operatorToken, right);
                 expr = temp;
             }
@@ -77,13 +93,13 @@ class Parser {
             return expr;
         }
 
-        Exprv comparison() {
-            Exprv expr = term();
+        Exprvp comparison() {
+            Exprvp expr = term();
 
             while(match({GREATER, GREATER_EQUAL, LESS, LESS_EQUAL})){
                 Token operatorToken = previous();
 
-                Exprv right = term();
+                Exprvp right = term();
 
                 Binv* temp = new Binv(expr, operatorToken, right);
                 expr = temp;
@@ -92,13 +108,13 @@ class Parser {
             return expr;
         }
 
-        Exprv term(){
-            Exprv expr = factor();
+        Exprvp term(){
+            Exprvp expr = factor();
 
             while(match({MINUS, PLUS})){
                 Token operatorToken = previous();
 
-                Exprv right = factor();
+                Exprvp right = factor();
 
                 Binv* temp = new Binv(expr, operatorToken, right);
                 
@@ -110,13 +126,13 @@ class Parser {
             return expr;
         };
 
-        Exprv factor(){
-            Exprv expr = unary();
+        Exprvp factor(){
+            Exprvp expr = unary();
 
             while(match({SLASH, STAR})){
                 Token operatorToken = previous();
 
-                Exprv right = unary();
+                Exprvp right = unary();
 
                 Binv* temp = new Binv(expr, operatorToken, right);
                 expr = temp;
@@ -126,11 +142,11 @@ class Parser {
         }; 
 
 
-        Exprv unary(){
-            Exprv res;
+        Exprvp unary(){
+            Exprvp res;
             if (match({BANG, MINUS})){
                 Token operatorToken = previous();
-                Exprv right = unary();
+                Exprvp right = unary();
 
                 Unav* unav = new Unav(operatorToken, right);
                 res = unav;
@@ -140,8 +156,8 @@ class Parser {
             return primary();
         }
 
-        Exprv primary(){
-            Exprv res;
+        Exprvp primary(){
+            Exprvp res;
             if (match({FALSE})) {
                 Litv* temp = new Litv("false");
                 res = temp;
@@ -168,7 +184,7 @@ class Parser {
             }
 
             if (match({LEFT_PAREN})) {
-                Exprv expr = expression();
+                Exprvp expr = expression();
                 consume(RIGHT_PAREN, "Expect ')' after expression.");
 
                 Groupv* temp = new Groupv(expr);
@@ -213,12 +229,13 @@ class Parser {
             this->tokens = tokens;
         }
 
-        Exprv parse(){
-            try {
-                return expression();
-            } catch (string message){
-                return nullptr;
+        vector<Stmtvp> parse(){
+            vector<Stmtvp> statements;
+            while (!isAtEnd()){
+                statements.push_back(statement());
             }
+
+            return statements;
         }
 };
 

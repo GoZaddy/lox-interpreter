@@ -5,25 +5,12 @@
 #include "expr.cpp"
 #include "util.h"
 #include <cstdlib>
-
+#include "types.h"
 
 namespace Interpreter {
-    
-    
-
-    typedef string rv; // rv - return value for visitor
-    typedef Visitor<rv> Visv;
-    typedef Literal<rv> Litv;
-    typedef Grouping<rv> Groupv;
-    typedef Expr<rv> Exprv;
-    typedef Unary<rv> Unav;
-    typedef Binary<rv> Binv;
-
-    
-
-    class Interpreter : public Visv{
+    class Interpreter : public ExprVisv{
         private:
-            rv evaluate(Exprv* expr){
+            rv evaluate(Exprvp expr){
                 return expr->accept(this);
             }
             bool isTruthy(rv object){
@@ -67,7 +54,7 @@ namespace Interpreter {
 
             
         public:
-            void interpret(Exprv* expression){
+            void interpret(Exprvp expression){
                 try{
                     rv value = evaluate(expression);
                     std::cout << stringify(value) << std::endl;

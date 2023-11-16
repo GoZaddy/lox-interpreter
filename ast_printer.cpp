@@ -8,7 +8,7 @@
 
 using namespace std;
 
-class AstPrinter: public Visitor<string> {
+class AstPrinter: public ExprVisitor<string> {
 
     private:
         string parenthesize(string name, initializer_list<Expr<string>*> exprs) {

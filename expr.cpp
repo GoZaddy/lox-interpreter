@@ -2,13 +2,14 @@
 #define EXPR
 #include <string>
 #include "token.h"
+
 using namespace std;
 
 template <typename T>
 class Expr;
 
 template <typename T>
-class Visitor;
+class ExprVisitor;
 
 
 template <typename T>
@@ -23,7 +24,7 @@ class Binary: public Expr<T> {
 			this->right = right;
 		}
 
-		T accept(Visitor<T>* visitor) {
+		T accept(ExprVisitor<T>* visitor) {
 			return visitor->visit(this);
 		}
 };
@@ -36,7 +37,7 @@ class Grouping: public Expr<T> {
 			this->expression = expression;
 		}
 
-		T accept(Visitor<T>* visitor) {
+		T accept(ExprVisitor<T>* visitor) {
 			return visitor->visit(this);
 		}
 };
@@ -49,7 +50,7 @@ class Literal: public Expr<T> {
 			this->value = value;
 		}
 
-		T accept(Visitor<T>* visitor) {
+		T accept(ExprVisitor<T>* visitor) {
 			return visitor->visit(this);
 		}
 };
@@ -64,14 +65,14 @@ class Unary: public Expr<T> {
 			this->right = right;
 		}
 
-		T accept(Visitor<T>* visitor) {
+		T accept(ExprVisitor<T>* visitor) {
 			return visitor->visit(this);
 		}
 };
 
 // visitor interface
 template <typename T>
-class Visitor {
+class ExprVisitor {
 	public:
 		virtual T visit(Binary<T>* expr) = 0;
 		virtual T visit(Grouping<T>* expr) = 0;
@@ -82,7 +83,7 @@ class Visitor {
 template <typename T>
 class Expr {
 	public:
-		virtual T accept(Visitor<T>* visitor) = 0;
+		virtual T accept(ExprVisitor<T>* visitor) = 0;
 };
 
 #endif
