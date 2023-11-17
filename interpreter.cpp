@@ -6,9 +6,10 @@
 #include "util.h"
 #include <cstdlib>
 #include "types.h"
+#include <vector>
 
 namespace Interpreter {
-    class Interpreter : public ExprVisv{
+    class Interpreter : public ExprVisv, public StmtVisv{
         private:
             rv evaluate(Exprvp expr){
                 return expr->accept(this);
@@ -51,14 +52,19 @@ namespace Interpreter {
                 return text;
             }
 
+            void execute(Stmtvp stmt){
+                stmt->accept(this);
+            }
 
             
         public:
-            void interpret(Exprvp expression){
+            void interpret(std::vector<Stmtvp> statements){
                 try{
-                    rv value = evaluate(expression);
-                    std::cout << stringify(value) << std::endl;
-                } catch(string error){};
+                    for (int i = 0; i < statements.size(); ++i){
+                        execute(statements[i]);
+                        // delete statements[i]; // i was testing something
+                    }
+                } catch(string error){std::cerr << error << endl;};
             }
             rv visit(Litv* expr){
                 return expr->value;
@@ -73,7 +79,7 @@ namespace Interpreter {
 
                 switch(expr->operatorToken.type){
                     case MINUS:
-                    checkNumberOperand(expr->operatorToken, right);
+                        checkNumberOperand(expr->operatorToken, right);
                         return "-"+right;
                     case BANG:
                         return isTruthy(right) ? "false" : "true";
@@ -132,6 +138,16 @@ namespace Interpreter {
                         //unreachable
                         return "";
                 }
+            }
+
+            rv visit(Expressionvp stmt){
+                return evaluate(stmt->expression);
+            }
+
+            rv visit(Printvp stmt){
+                rv value = evaluate(stmt->expression);
+                std::cout << value << endl;
+                return value;
             }
 
 

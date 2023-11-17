@@ -28,7 +28,11 @@ void run(string source){
 
     Parser parser(tokens);
 
-    // Exprvp expression = parser.parse();
+    vector<Stmtvp> statements = parser.parse();
+    
+    // Exprvp value = new Litv("true");
+    // Stmtvp stmt = new Printv(value);
+    // vector<Stmtvp> statements = {stmt};
 
     if (Util::hadError) return;
 
@@ -36,7 +40,7 @@ void run(string source){
     // AstPrinter asp;
     // cout << asp.print(expression) << endl;
 
-    // interpreter.interpret(expression);
+    interpreter.interpret(statements);
 }
 
 

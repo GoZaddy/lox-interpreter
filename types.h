@@ -14,9 +14,11 @@ typedef Expr<rv>* Exprvp;
 typedef Unary<rv> Unav;
 typedef Binary<rv> Binv;
 typedef Stmt<rv> Stmtv;
-typedef Stmt<rv>* Stmtvp;
+typedef Stmtv* Stmtvp;
 typedef Expression<rv> Expressionv;
+typedef Expressionv* Expressionvp;
 typedef Print<rv> Printv;
+typedef Printv* Printvp;
 
 
 

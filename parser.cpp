@@ -231,9 +231,15 @@ class Parser {
 
         vector<Stmtvp> parse(){
             vector<Stmtvp> statements;
-            while (!isAtEnd()){
-                statements.push_back(statement());
+            try{
+                while (!isAtEnd()){
+                    statements.push_back(statement());
+                }
+            } catch(string error){
+                std::cerr << error << endl;
             }
+            
+            
 
             return statements;
         }
