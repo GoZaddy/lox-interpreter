@@ -7,10 +7,13 @@
 #include <cstdlib>
 #include "types.h"
 #include <vector>
+#include "environment.cpp"
 
 namespace Interpreter {
     class Interpreter : public ExprVisv, public StmtVisv{
         private:
+            Environment environment;
+
             rv evaluate(Exprvp expr){
                 return expr->accept(this);
             }
@@ -140,6 +143,10 @@ namespace Interpreter {
                 }
             }
 
+            rv visit(Variablevp expr){
+                return environment.get(expr->name);
+            }
+
             rv visit(Expressionvp stmt){
                 return evaluate(stmt->expression);
             }
@@ -149,6 +156,18 @@ namespace Interpreter {
                 std::cout << value << endl;
                 return value;
             }
+
+            rv visit(Varvp stmt){
+                string value = "";
+                if (stmt->initializer != nullptr){
+                    value = evaluate(stmt->initializer);
+                }
+
+                environment.define(stmt->name.lexeme, value);
+                return value;
+            }
+
+            
 
 
     };

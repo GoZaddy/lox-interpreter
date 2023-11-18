@@ -195,7 +195,8 @@ int main(int argc, char *argv[]){
       "Binary   : Expr<T>* left, Token operatorToken, Expr<T>* right",
       "Grouping : Expr<T>* expression",
       "Literal  : string value",
-      "Unary    : Token operatorToken, Expr<T>* right"
+      "Unary    : Token operatorToken, Expr<T>* right",
+      "Variable : Token name"
     };
 
     defineAst(outputdir, "Expr", expressionSubtypes);
@@ -203,7 +204,8 @@ int main(int argc, char *argv[]){
 
     vector<string> statementSubtypes = {
         "Expression : Expr<T>* expression",
-        "Print      : Expr<T>* expression"
+        "Print      : Expr<T>* expression",
+        "Var        : Token name, Expr<T>* initializer"
     };
 
     defineAst(outputdir, "Stmt", statementSubtypes, "#include \"expr.cpp\"\n");

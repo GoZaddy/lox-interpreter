@@ -60,6 +60,17 @@ class Parser {
             return equality();
         }
 
+        Stmtvp declaration(){
+            try {
+                if (match({VAR})) return varDeclaration();
+
+                return statement();
+            } catch (string error){
+                synchronize();
+                return nullptr;
+            }
+        }
+
         Stmtvp statement() {
             if (match({PRINT})) return printStatement();
 
@@ -71,6 +82,18 @@ class Parser {
             consume(SEMICOLON, "Expect ';' after value.");
             Stmtvp stmt = new Printv(value);
             return stmt;
+        }
+
+        Stmtvp varDeclaration(){
+            Token name = consume(IDENTIFIER, "Expect variable name.");
+
+            Exprvp initializer = nullptr;
+            if (match({EQUAL})){
+                initializer = expression();
+            }
+
+            consume(SEMICOLON, "Expect ';' after variable declaration.");
+            return new Varv(name, initializer);
         }
 
         Stmtvp expressionStatement() {
@@ -183,6 +206,11 @@ class Parser {
                 return res;
             }
 
+            if (match({IDENTIFIER})){
+                res = new Variablev(previous());
+                return res;
+            }
+
             if (match({LEFT_PAREN})) {
                 Exprvp expr = expression();
                 consume(RIGHT_PAREN, "Expect ')' after expression.");
@@ -233,7 +261,7 @@ class Parser {
             vector<Stmtvp> statements;
             try{
                 while (!isAtEnd()){
-                    statements.push_back(statement());
+                    statements.push_back(declaration());
                 }
             } catch(string error){
                 std::cerr << error << endl;

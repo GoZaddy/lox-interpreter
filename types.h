@@ -13,12 +13,16 @@ typedef Expr<rv> Exprv;
 typedef Expr<rv>* Exprvp;
 typedef Unary<rv> Unav;
 typedef Binary<rv> Binv;
+typedef Variable<rv> Variablev;
+typedef Variablev* Variablevp;
 typedef Stmt<rv> Stmtv;
 typedef Stmtv* Stmtvp;
 typedef Expression<rv> Expressionv;
 typedef Expressionv* Expressionvp;
 typedef Print<rv> Printv;
 typedef Printv* Printvp;
+typedef Var<rv> Varv;
+typedef Varv* Varvp;
 
 
 

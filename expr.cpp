@@ -70,6 +70,19 @@ class Unary: public Expr<T> {
 		}
 };
 
+template <typename T>
+class Variable: public Expr<T> {
+	public:
+		Token name;
+		Variable(Token name) {
+			this->name = name;
+		}
+
+		T accept(ExprVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+};
+
 // visitor interface
 template <typename T>
 class ExprVisitor {
@@ -78,6 +91,7 @@ class ExprVisitor {
 		virtual T visit(Grouping<T>* expr) = 0;
 		virtual T visit(Literal<T>* expr) = 0;
 		virtual T visit(Unary<T>* expr) = 0;
+		virtual T visit(Variable<T>* expr) = 0;
 };
 
 template <typename T>

@@ -39,12 +39,28 @@ class Print: public Stmt<T> {
 		}
 };
 
+template <typename T>
+class Var: public Stmt<T> {
+	public:
+		Token name;
+		Expr<T>* initializer;
+		Var(Token name, Expr<T>* initializer) {
+			this->name = name;
+			this->initializer = initializer;
+		}
+
+		T accept(StmtVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+};
+
 // visitor interface
 template <typename T>
 class StmtVisitor {
 	public:
 		virtual T visit(Expression<T>* stmt) = 0;
 		virtual T visit(Print<T>* stmt) = 0;
+		virtual T visit(Var<T>* stmt) = 0;
 };
 
 template <typename T>
