@@ -214,6 +214,7 @@ int main(int argc, char *argv[]){
     vector<string> statementSubtypes = {
         "Block      : std::vector<Stmt<T>*> statements",
         "Expression : Expr<T>* expression",
+        "If         : Expr<T>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch",
         "Print      : Expr<T>* expression",
         "Var        : Token name, Expr<T>* initializer"
     };

@@ -74,8 +74,23 @@ class Parser {
         Stmtvp statement() {
             if (match({PRINT})) return printStatement();
             if (match({LEFT_BRACE})) return new Blockv(block());
+            if (match({IF})) return ifStatement();
 
             return expressionStatement();
+        }
+
+        Stmtvp ifStatement() {
+            consume(LEFT_PAREN, "Expect '(' after 'if'.");
+            Exprvp condition = expression();
+            consume(RIGHT_PAREN, "Expect ')' after if condition."); 
+
+            Stmtvp thenBranch = statement();
+            Stmtvp elseBranch = nullptr;
+            if (match({ELSE})) {
+                elseBranch = statement();
+            }
+
+            return new If(condition, thenBranch, elseBranch);
         }
 
         Stmtvp printStatement() {

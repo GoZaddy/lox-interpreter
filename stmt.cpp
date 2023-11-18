@@ -49,6 +49,27 @@ class Expression: public Stmt<T> {
 };
 
 template <typename T>
+class If: public Stmt<T> {
+	public:
+		Expr<T>* condition;
+		Stmt<T>* thenBranch;
+		Stmt<T>* elseBranch;
+		If(Expr<T>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch) {
+			this->condition = condition;
+			this->thenBranch = thenBranch;
+			this->elseBranch = elseBranch;
+		}
+
+		T accept(StmtVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "If";
+		}
+};
+
+template <typename T>
 class Print: public Stmt<T> {
 	public:
 		Expr<T>* expression;
@@ -90,6 +111,7 @@ class StmtVisitor {
 	public:
 		virtual T visit(Block<T>* stmt) = 0;
 		virtual T visit(Expression<T>* stmt) = 0;
+		virtual T visit(If<T>* stmt) = 0;
 		virtual T visit(Print<T>* stmt) = 0;
 		virtual T visit(Var<T>* stmt) = 0;
 };
