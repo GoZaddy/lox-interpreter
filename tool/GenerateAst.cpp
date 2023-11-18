@@ -98,6 +98,12 @@ void defineType(
     fileStream << "\t\t\treturn visitor->visit" << "(this);" << endl;
     fileStream << "\t\t}" << endl;
 
+    // overriding getType() method
+    fileStream << endl;
+    fileStream << "\t\tstring getType() {" << endl;
+    fileStream << "\t\t\treturn \"" << className << "\";" << endl;
+    fileStream << "\t\t}" << endl;
+
 
 
     fileStream << "};" << endl << endl;
@@ -149,6 +155,7 @@ void defineAst(
     fileStream << "#define " << uppercase(baseName) << endl;
 
     fileStream << "#include <string>" << endl;
+    fileStream << "#include <vector>" << endl;
     fileStream << "#include \"token.h\"" << endl;
     fileStream << beginningStatements << endl;
     fileStream << "using namespace std;" << endl << endl;
@@ -177,6 +184,7 @@ void defineAst(
     fileStream << "class " << baseName << " {" << endl;
     fileStream << "\tpublic:" << endl;
     fileStream << "\t\tvirtual T accept(" << baseName << "Visitor<T>* visitor) = 0;" << endl;
+    fileStream << "\t\tvirtual string getType() = 0;" << endl;
     fileStream << "};" << endl << endl;
 
     fileStream << "#endif" << endl;
@@ -192,6 +200,7 @@ int main(int argc, char *argv[]){
     string outputdir = argv[1];
 
     vector<string> expressionSubtypes = {
+      "Assign   : Token name, Expr<T>* value",
       "Binary   : Expr<T>* left, Token operatorToken, Expr<T>* right",
       "Grouping : Expr<T>* expression",
       "Literal  : string value",
@@ -203,6 +212,7 @@ int main(int argc, char *argv[]){
 
 
     vector<string> statementSubtypes = {
+        "Block      : std::vector<Stmt<T>*> statements",
         "Expression : Expr<T>* expression",
         "Print      : Expr<T>* expression",
         "Var        : Token name, Expr<T>* initializer"

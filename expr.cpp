@@ -1,6 +1,7 @@
 #ifndef EXPR
 #define EXPR
 #include <string>
+#include <vector>
 #include "token.h"
 
 using namespace std;
@@ -11,6 +12,25 @@ class Expr;
 template <typename T>
 class ExprVisitor;
 
+
+template <typename T>
+class Assign: public Expr<T> {
+	public:
+		Token name;
+		Expr<T>* value;
+		Assign(Token name, Expr<T>* value) {
+			this->name = name;
+			this->value = value;
+		}
+
+		T accept(ExprVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "Assign";
+		}
+};
 
 template <typename T>
 class Binary: public Expr<T> {
@@ -27,6 +47,10 @@ class Binary: public Expr<T> {
 		T accept(ExprVisitor<T>* visitor) {
 			return visitor->visit(this);
 		}
+
+		string getType() {
+			return "Binary";
+		}
 };
 
 template <typename T>
@@ -40,6 +64,10 @@ class Grouping: public Expr<T> {
 		T accept(ExprVisitor<T>* visitor) {
 			return visitor->visit(this);
 		}
+
+		string getType() {
+			return "Grouping";
+		}
 };
 
 template <typename T>
@@ -52,6 +80,10 @@ class Literal: public Expr<T> {
 
 		T accept(ExprVisitor<T>* visitor) {
 			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "Literal";
 		}
 };
 
@@ -68,6 +100,10 @@ class Unary: public Expr<T> {
 		T accept(ExprVisitor<T>* visitor) {
 			return visitor->visit(this);
 		}
+
+		string getType() {
+			return "Unary";
+		}
 };
 
 template <typename T>
@@ -81,12 +117,17 @@ class Variable: public Expr<T> {
 		T accept(ExprVisitor<T>* visitor) {
 			return visitor->visit(this);
 		}
+
+		string getType() {
+			return "Variable";
+		}
 };
 
 // visitor interface
 template <typename T>
 class ExprVisitor {
 	public:
+		virtual T visit(Assign<T>* expr) = 0;
 		virtual T visit(Binary<T>* expr) = 0;
 		virtual T visit(Grouping<T>* expr) = 0;
 		virtual T visit(Literal<T>* expr) = 0;
@@ -98,6 +139,7 @@ template <typename T>
 class Expr {
 	public:
 		virtual T accept(ExprVisitor<T>* visitor) = 0;
+		virtual string getType() = 0;
 };
 
 #endif

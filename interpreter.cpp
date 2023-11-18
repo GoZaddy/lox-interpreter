@@ -59,6 +59,25 @@ namespace Interpreter {
                 stmt->accept(this);
             }
 
+            void executeBlock(
+                std::vector<Stmtvp> statements,
+                Environment* environment
+            ) {
+                Environment previous = this->environment;
+                try {
+                    this->environment = *environment;
+
+                    for (auto statement : statements) {
+                        execute(statement);
+                    }
+                } 
+                catch(string error){std::cerr << error << endl;}
+                catch (...){std:cerr << "unrecognized error occurred" << endl;}
+                
+                this->environment = previous;
+                
+            }
+
             
         public:
             void interpret(std::vector<Stmtvp> statements){
@@ -147,6 +166,12 @@ namespace Interpreter {
                 return environment.get(expr->name);
             }
 
+            rv visit(Assignvp expr){
+                rv value = evaluate(expr->value);
+                environment.assign(expr->name, value);
+                return value;
+            }
+
             rv visit(Expressionvp stmt){
                 return evaluate(stmt->expression);
             }
@@ -165,6 +190,11 @@ namespace Interpreter {
 
                 environment.define(stmt->name.lexeme, value);
                 return value;
+            }
+
+            rv visit(Blockvp stmt) {
+                executeBlock(stmt->statements, new Environment(environment));
+                return "";
             }
 
             

@@ -15,6 +15,8 @@ typedef Unary<rv> Unav;
 typedef Binary<rv> Binv;
 typedef Variable<rv> Variablev;
 typedef Variablev* Variablevp;
+typedef Assign<rv> Assignv;
+typedef Assign<rv>* Assignvp;
 typedef Stmt<rv> Stmtv;
 typedef Stmtv* Stmtvp;
 typedef Expression<rv> Expressionv;
@@ -23,6 +25,8 @@ typedef Print<rv> Printv;
 typedef Printv* Printvp;
 typedef Var<rv> Varv;
 typedef Varv* Varvp;
+typedef Block<rv> Blockv;
+typedef Blockv* Blockvp;
 
 
 

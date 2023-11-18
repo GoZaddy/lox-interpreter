@@ -57,7 +57,7 @@ class Parser {
         }
 
         Exprvp expression(){
-            return equality();
+            return assignment();
         }
 
         Stmtvp declaration(){
@@ -73,6 +73,7 @@ class Parser {
 
         Stmtvp statement() {
             if (match({PRINT})) return printStatement();
+            if (match({LEFT_BRACE})) return new Blockv(block());
 
             return expressionStatement();
         }
@@ -101,6 +102,35 @@ class Parser {
             consume(SEMICOLON, "Expect ';' after expression.");
             Stmtvp stmt = new Expressionv(expr);
             return stmt;
+        }
+
+        vector<Stmtvp> block() {
+            vector<Stmtvp> statements;
+
+            while (!check(RIGHT_BRACE) && !isAtEnd()) {
+                statements.push_back(declaration());
+            }
+
+            consume(RIGHT_BRACE, "Expect '}' after block.");
+            return statements;
+        }
+
+        Exprvp assignment(){
+            Exprvp expr = equality();
+
+            if (match({EQUAL})) {
+                Token equals = previous();
+                Exprvp value = assignment();
+
+                if (expr->getType() == "Variable") {
+                    Token name = ((Variablevp) expr)->name;
+                    return new Assignv(name, value);
+                }
+
+                Util::error(equals, "Invalid assignment target."); 
+            }
+
+            return expr;
         }
 
         Exprvp equality(){
