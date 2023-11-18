@@ -17,6 +17,10 @@ class Environment {
         Environment(){
             enclosing = nullptr;
         }
+         Environment(Environment* enclosing) {
+            this->enclosing = enclosing;
+        }
+
         void define(string name, string value){
             values[name] = value;
         }
@@ -26,6 +30,7 @@ class Environment {
                 return values[name.lexeme];
             }
 
+            if (enclosing != nullptr) return enclosing->get(name);
 
             throw Util::runtimeError(
                 name,
@@ -36,6 +41,11 @@ class Environment {
         void assign(Token name, string value) {
             if (values.find(name.lexeme) != values.end()) {
                 values[name.lexeme] = value;
+                return;
+            }
+
+            if (enclosing != nullptr) {
+                enclosing->assign(name, value);
                 return;
             }
 
