@@ -8,15 +8,18 @@
 #include "types.h"
 #include <vector>
 #include "environment.cpp"
+#include "native_funcs.cpp"
+#include "lox_function.cpp"
 
 namespace Interpreter {
     class Interpreter : public ExprVisv, public StmtVisv{
         private:
-            Environment* globals = new Environment();
-            Environment* environment = globals;
+            Environment* environment = globals; // TODO: I wonder if this causes issues
 
             rv evaluate(Exprvp expr){
-                return expr->accept(this);
+                rv value = expr->accept(this);
+                // delete expr; // TODO: test this out
+                return value;
             }
             bool isTruthy(rv object){
                 if (object == "nil") return false; // TODO: what other values could return false
@@ -60,6 +63,26 @@ namespace Interpreter {
                 stmt->accept(this);
             }
 
+            
+
+            
+        public:
+            Environment* globals = new Environment();
+            
+
+            Interpreter() {
+                Clock clockFunc;
+                globals->define("clock", clockFunc); // TODO: figure this out, consider using a new map in Environment for just functions
+            }
+            void interpret(std::vector<Stmtvp> statements){
+                try{
+                    for (int i = 0; i < statements.size(); ++i){
+                        execute(statements[i]);
+                        // delete statements[i]; // i was testing something
+                    }
+                } catch(string error){std::cerr << error << endl;};
+            }
+
             void executeBlock(
                 std::vector<Stmtvp> statements,
                 Environment* environment
@@ -79,16 +102,7 @@ namespace Interpreter {
                 
             }
 
-            
-        public:
-            void interpret(std::vector<Stmtvp> statements){
-                try{
-                    for (int i = 0; i < statements.size(); ++i){
-                        execute(statements[i]);
-                        // delete statements[i]; // i was testing something
-                    }
-                } catch(string error){std::cerr << error << endl;};
-            }
+
             rv visit(Litv* expr){
                 return expr->value;
             }
@@ -208,6 +222,12 @@ namespace Interpreter {
                 return evaluate(stmt->expression);
             }
 
+            rv visit(Functionvp stmt){
+                LoxFunction* function = new LoxFunction(stmt);
+                environment->define(stmt->name.lexeme, function); // come up with our solution for this
+                return "";
+            }
+
             rv visit(Ifvp stmt) {
                 if (isTruthy(evaluate(stmt->condition))) {
                     execute(stmt->thenBranch);
@@ -241,7 +261,9 @@ namespace Interpreter {
             }
 
             rv visit(Blockvp stmt) {
-                executeBlock(stmt->statements, new Environment(environment));
+                Environment* newEnv = new Environment(environment); 
+                executeBlock(stmt->statements, newEnv);
+                delete newEnv; // free memory
                 return "";
             }
 

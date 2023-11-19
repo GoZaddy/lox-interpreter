@@ -15,7 +15,7 @@ class Clock : public LoxCallable{
         int arity() { return 0; }
 
         rv call(
-            Interpreter::Interpreter interpreter,
+            Interpreter::Interpreter& interpreter,
             std::vector<rv> arguments
         ) {
             milliseconds ms = std::chrono::duration_cast< milliseconds >(
