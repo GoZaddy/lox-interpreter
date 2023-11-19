@@ -62,6 +62,7 @@ class Parser {
 
         Stmtvp declaration(){
             try {
+                if (match({FUN})) return function("function");
                 if (match({VAR})) return varDeclaration();
 
                 return statement();
@@ -181,6 +182,29 @@ class Parser {
             consume(SEMICOLON, "Expect ';' after expression.");
             Stmtvp stmt = new Expressionv(expr);
             return stmt;
+        }
+
+        Functionvp function(string kind) {
+            Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
+
+            consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+            vector<Token> parameters;
+            if (!check(RIGHT_PAREN)) {
+                do {
+                    if (parameters.size() >= 255) {
+                        Util::error(peek(), "Can't have more than 255 parameters.");
+                    }
+
+                    parameters.push_back(
+                        consume(IDENTIFIER, "Expect parameter name.")
+                    );
+                } while (match({COMMA}));
+            }
+            consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+            consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+            vector<Stmtvp> body = block();
+            return new Functionv(name, parameters, body);
         }
 
         vector<Stmtvp> block() {
@@ -309,7 +333,37 @@ class Parser {
                 return res;
             }
 
-            return primary();
+            return call_expr();
+        }
+
+        Exprvp finishCall(Exprvp callee) {
+            vector<Exprvp> arguments;
+            if (!check(RIGHT_PAREN)) {
+                do {
+                    if (arguments.size() >= 255) {
+                        Util::error(peek(), "Can't have more than 255 arguments.");
+                    }
+                    arguments.push_back(expression());
+                } while (match({COMMA}));
+            }
+
+            Token paren = consume(RIGHT_PAREN,  "Expect ')' after arguments.");
+
+            return new Callv(callee, paren, arguments);
+        }
+
+        Exprvp call_expr() {
+            Exprvp expr = primary();
+
+            while (true) { 
+                if (match({LEFT_PAREN})) {
+                    expr = finishCall(expr);
+                } else {
+                    break;
+                }
+            }
+
+            return expr;
         }
 
         Exprvp primary(){

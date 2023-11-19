@@ -15,6 +15,8 @@ typedef Expr<rv> Exprv;
 typedef Expr<rv>* Exprvp;
 typedef Unary<rv> Unav;
 typedef Binary<rv> Binv;
+typedef Call<rv> Callv;
+typedef Callv* Callvp;
 typedef Variable<rv> Variablev;
 typedef Variablev* Variablevp;
 typedef Assign<rv> Assignv;
@@ -33,7 +35,8 @@ typedef If<rv> Ifv;
 typedef Ifv* Ifvp;
 typedef While<rv> Whilev;
 typedef Whilev* Whilevp;
-
+typedef Function<rv> Functionv;
+typedef Functionv* Functionvp;
 
 
 #endif

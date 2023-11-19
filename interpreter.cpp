@@ -12,7 +12,8 @@
 namespace Interpreter {
     class Interpreter : public ExprVisv, public StmtVisv{
         private:
-            Environment* environment = new Environment();
+            Environment* globals = new Environment();
+            Environment* environment = globals;
 
             rv evaluate(Exprvp expr){
                 return expr->accept(this);
@@ -172,6 +173,25 @@ namespace Interpreter {
                         //unreachable
                         return "";
                 }
+            }
+
+            rv visit(Callvp expr) {
+                rv callee = evaluate(expr->callee);
+
+                std::vector<rv> arguments;
+                for (auto argument : expr->arguments) { 
+                    arguments.push_back(evaluate(argument));
+                }
+
+
+                LoxCallable func = callee; // figure this out
+
+                if (arguments.size() != func.arity()) {
+                    throw Util::runtimeError(expr->paren, "Expected " +
+                        func.arity() + " arguments but got " +
+                        arguments.size() + ".");
+                }
+                return func.call(this, arguments);
             }
 
             rv visit(Variablevp expr){

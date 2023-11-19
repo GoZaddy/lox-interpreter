@@ -202,6 +202,7 @@ int main(int argc, char *argv[]){
     vector<string> expressionSubtypes = {
       "Assign   : Token name, Expr<T>* value",
       "Binary   : Expr<T>* left, Token operatorToken, Expr<T>* right",
+      "Call     : Expr<T>* callee, Token paren, std::vector<Expr<T>*> arguments",
       "Grouping : Expr<T>* expression",
       "Literal  : string value",
       "Logical  : Expr<T>* left, Token operatorToken, Expr<T>* right",
@@ -215,6 +216,7 @@ int main(int argc, char *argv[]){
     vector<string> statementSubtypes = {
         "Block      : std::vector<Stmt<T>*> statements",
         "Expression : Expr<T>* expression",
+        "Function   : Token name, std::vector<Token> params, std::vector<Stmt<T>*> body",
         "If         : Expr<T>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch",
         "Print      : Expr<T>* expression",
         "Var        : Token name, Expr<T>* initializer",

@@ -54,6 +54,27 @@ class Binary: public Expr<T> {
 };
 
 template <typename T>
+class Call: public Expr<T> {
+	public:
+		Expr<T>* callee;
+		Token paren;
+		std::vector<Expr<T>*> arguments;
+		Call(Expr<T>* callee, Token paren, std::vector<Expr<T>*> arguments) {
+			this->callee = callee;
+			this->paren = paren;
+			this->arguments = arguments;
+		}
+
+		T accept(ExprVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "Call";
+		}
+};
+
+template <typename T>
 class Grouping: public Expr<T> {
 	public:
 		Expr<T>* expression;
@@ -150,6 +171,7 @@ class ExprVisitor {
 	public:
 		virtual T visit(Assign<T>* expr) = 0;
 		virtual T visit(Binary<T>* expr) = 0;
+		virtual T visit(Call<T>* expr) = 0;
 		virtual T visit(Grouping<T>* expr) = 0;
 		virtual T visit(Literal<T>* expr) = 0;
 		virtual T visit(Logical<T>* expr) = 0;
