@@ -12,7 +12,7 @@
 namespace Interpreter {
     class Interpreter : public ExprVisv, public StmtVisv{
         private:
-            Environment environment;
+            Environment* environment = new Environment();
 
             rv evaluate(Exprvp expr){
                 return expr->accept(this);
@@ -48,7 +48,7 @@ namespace Interpreter {
                 throw Util::runtimeError(operatorToken, "Operands must be numbers");
             }
 
-            string stringify(rv text){
+            string stripTrailingZeroes(rv text){
                 if (text.size() > 7 && text.substr(text.size()-7) == ".000000"){
                     text = text.substr(0, text.size()-7);
                 }
@@ -63,9 +63,9 @@ namespace Interpreter {
                 std::vector<Stmtvp> statements,
                 Environment* environment
             ) {
-                Environment previous = this->environment;
+                Environment* previous = this->environment;
                 try {
-                    this->environment = *environment;
+                    this->environment = environment;
 
                     for (auto statement : statements) {
                         execute(statement);
@@ -90,6 +90,18 @@ namespace Interpreter {
             }
             rv visit(Litv* expr){
                 return expr->value;
+            }
+
+            rv visit(Logicalvp expr) {
+                rv left = evaluate(expr->left);
+
+                if (expr->operatorToken.type == OR) {
+                    if (isTruthy(left)) return left;
+                } else {
+                    if (!isTruthy(left)) return left;
+                }
+
+                return evaluate(expr->right);
             }
 
             rv visit(Groupv* expr){
@@ -118,13 +130,13 @@ namespace Interpreter {
                 switch(expr->operatorToken.type){
                     case MINUS:
                         checkNumberOperands(expr->operatorToken, left, right);
-                        return std::to_string(Util::doub(left) - Util::doub(right));
+                        return stripTrailingZeroes(std::to_string(Util::doub(left) - Util::doub(right)));
                     case SLASH:
                         checkNumberOperands(expr->operatorToken, left, right);
-                        return std::to_string(Util::doub(left) / Util::doub(right));
+                        return stripTrailingZeroes(std::to_string(Util::doub(left) / Util::doub(right)));
                     case STAR:
                         checkNumberOperands(expr->operatorToken, left, right);
-                        return std::to_string(Util::doub(left) * Util::doub(right));
+                        return stripTrailingZeroes(std::to_string(Util::doub(left) * Util::doub(right)));
                     case PLUS:
                         if (isStringLiteral(left) && isStringLiteral(right)){
                             left.pop_back();
@@ -132,7 +144,7 @@ namespace Interpreter {
                         }
                         
                         if (isNumberLiteral(left) && isNumberLiteral(right)){
-                            return std::to_string(Util::doub(left) + Util::doub(right));
+                            return stripTrailingZeroes(std::to_string(Util::doub(left) + Util::doub(right)));
                         }
 
                         throw Util::runtimeError(expr->operatorToken, "Operands must be two numbers or two strings.");
@@ -163,12 +175,12 @@ namespace Interpreter {
             }
 
             rv visit(Variablevp expr){
-                return environment.get(expr->name);
+                return environment->get(expr->name);
             }
 
             rv visit(Assignvp expr){
                 rv value = evaluate(expr->value);
-                environment.assign(expr->name, value);
+                environment->assign(expr->name, value);
                 return value;
             }
 
@@ -176,10 +188,19 @@ namespace Interpreter {
                 return evaluate(stmt->expression);
             }
 
+            rv visit(Ifvp stmt) {
+                if (isTruthy(evaluate(stmt->condition))) {
+                    execute(stmt->thenBranch);
+                } else if (stmt->elseBranch != nullptr) {
+                    execute(stmt->elseBranch);
+                }
+                return "";
+            }
+
             rv visit(Printvp stmt){
                 rv value = evaluate(stmt->expression);
                 std::cout << value << endl;
-                return value;
+                return "";
             }
 
             rv visit(Varvp stmt){
@@ -188,8 +209,15 @@ namespace Interpreter {
                     value = evaluate(stmt->initializer);
                 }
 
-                environment.define(stmt->name.lexeme, value);
+                environment->define(stmt->name.lexeme, value);
                 return value;
+            }
+
+            rv visit(Whilevp stmt) {
+                while (isTruthy(evaluate(stmt->condition))) {
+                    execute(stmt->body);
+                }
+                return "";
             }
 
             rv visit(Blockvp stmt) {

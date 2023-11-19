@@ -72,11 +72,66 @@ class Parser {
         }
 
         Stmtvp statement() {
-            if (match({PRINT})) return printStatement();
-            if (match({LEFT_BRACE})) return new Blockv(block());
+            if (match({FOR})) return forStatement();
             if (match({IF})) return ifStatement();
-
+            if (match({PRINT})) return printStatement();
+            if (match({WHILE})) return whileStatement();
+            if (match({LEFT_BRACE})) return new Blockv(block());
+            
             return expressionStatement();
+        }
+
+        Stmtvp forStatement() {
+            consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+            Stmtvp initializer;
+            if (match({SEMICOLON})) {
+                initializer = nullptr;
+            } else if (match({VAR})) {
+                initializer = varDeclaration();
+            } else {
+                initializer = expressionStatement();
+            }
+
+
+            Exprvp condition = nullptr;
+            if (!check(SEMICOLON)) {
+                condition = expression();
+            }
+            consume(SEMICOLON, "Expect ';' after loop condition.");
+
+            Exprvp increment = nullptr;
+            if (!check(RIGHT_PAREN)) {
+            increment = expression();
+            }
+            consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+
+            Stmtvp body = statement();
+
+            // desugaring
+            std::vector<Stmtvp> statements;
+            if (increment != nullptr) {
+                statements = {
+                    body,
+                    new Expressionv(increment)
+                };
+                
+                body = new Blockv(statements);
+            }
+
+
+            if (condition == nullptr){
+                condition = new Litv("true");
+            }
+            body = new Whilev(condition, body);
+
+            if (initializer != nullptr) {
+                statements = {initializer, body};
+                body = new Blockv(statements);
+            }
+
+            return body;
         }
 
         Stmtvp ifStatement() {
@@ -90,7 +145,7 @@ class Parser {
                 elseBranch = statement();
             }
 
-            return new If(condition, thenBranch, elseBranch);
+            return new Ifv(condition, thenBranch, elseBranch);
         }
 
         Stmtvp printStatement() {
@@ -112,6 +167,15 @@ class Parser {
             return new Varv(name, initializer);
         }
 
+        Stmtvp whileStatement() {
+            consume(LEFT_PAREN, "Expect '(' after 'while'.");
+            Exprvp condition = expression();
+            consume(RIGHT_PAREN, "Expect ')' after condition.");
+            Stmtvp body = statement();
+
+            return new Whilev(condition, body);
+        }
+
         Stmtvp expressionStatement() {
             Exprvp expr = expression();
             consume(SEMICOLON, "Expect ';' after expression.");
@@ -131,7 +195,7 @@ class Parser {
         }
 
         Exprvp assignment(){
-            Exprvp expr = equality();
+            Exprvp expr = or_expr();
 
             if (match({EQUAL})) {
                 Token equals = previous();
@@ -143,6 +207,30 @@ class Parser {
                 }
 
                 Util::error(equals, "Invalid assignment target."); 
+            }
+
+            return expr;
+        }
+
+        Exprvp or_expr() {
+            Exprvp expr = and_expr();
+
+            while (match({OR})) {
+                Token operatorToken = previous();
+                Exprvp right = and_expr();
+                expr = new Logicalv(expr, operatorToken, right);
+            }
+
+            return expr;
+        }
+
+        Exprvp and_expr() {
+            Exprvp expr = equality();
+
+            while (match({AND})) {
+                Token operatorToken = previous();
+                Exprvp right = equality();
+                expr = new Logicalv(expr, operatorToken, right);
             }
 
             return expr;

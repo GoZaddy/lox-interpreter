@@ -88,6 +88,27 @@ class Literal: public Expr<T> {
 };
 
 template <typename T>
+class Logical: public Expr<T> {
+	public:
+		Expr<T>* left;
+		Token operatorToken;
+		Expr<T>* right;
+		Logical(Expr<T>* left, Token operatorToken, Expr<T>* right) {
+			this->left = left;
+			this->operatorToken = operatorToken;
+			this->right = right;
+		}
+
+		T accept(ExprVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "Logical";
+		}
+};
+
+template <typename T>
 class Unary: public Expr<T> {
 	public:
 		Token operatorToken;
@@ -131,6 +152,7 @@ class ExprVisitor {
 		virtual T visit(Binary<T>* expr) = 0;
 		virtual T visit(Grouping<T>* expr) = 0;
 		virtual T visit(Literal<T>* expr) = 0;
+		virtual T visit(Logical<T>* expr) = 0;
 		virtual T visit(Unary<T>* expr) = 0;
 		virtual T visit(Variable<T>* expr) = 0;
 };

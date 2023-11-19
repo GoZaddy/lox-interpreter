@@ -204,6 +204,7 @@ int main(int argc, char *argv[]){
       "Binary   : Expr<T>* left, Token operatorToken, Expr<T>* right",
       "Grouping : Expr<T>* expression",
       "Literal  : string value",
+      "Logical  : Expr<T>* left, Token operatorToken, Expr<T>* right",
       "Unary    : Token operatorToken, Expr<T>* right",
       "Variable : Token name"
     };
@@ -216,7 +217,8 @@ int main(int argc, char *argv[]){
         "Expression : Expr<T>* expression",
         "If         : Expr<T>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch",
         "Print      : Expr<T>* expression",
-        "Var        : Token name, Expr<T>* initializer"
+        "Var        : Token name, Expr<T>* initializer",
+        "While      : Expr<T>* condition, Stmt<T>* body"
     };
 
     defineAst(outputdir, "Stmt", statementSubtypes, "#include \"expr.cpp\"\n");

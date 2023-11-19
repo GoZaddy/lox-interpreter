@@ -8,6 +8,8 @@ typedef string rv; // rv - return value for visitor
 typedef ExprVisitor<rv> ExprVisv;
 typedef StmtVisitor<rv> StmtVisv;
 typedef Literal<rv> Litv;
+typedef Logical<rv> Logicalv;
+typedef Logicalv* Logicalvp;
 typedef Grouping<rv> Groupv;
 typedef Expr<rv> Exprv;
 typedef Expr<rv>* Exprvp;
@@ -27,6 +29,10 @@ typedef Var<rv> Varv;
 typedef Varv* Varvp;
 typedef Block<rv> Blockv;
 typedef Blockv* Blockvp;
+typedef If<rv> Ifv;
+typedef Ifv* Ifvp;
+typedef While<rv> Whilev;
+typedef Whilev* Whilevp;
 
 
 

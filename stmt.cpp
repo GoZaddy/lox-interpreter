@@ -105,6 +105,25 @@ class Var: public Stmt<T> {
 		}
 };
 
+template <typename T>
+class While: public Stmt<T> {
+	public:
+		Expr<T>* condition;
+		Stmt<T>* body;
+		While(Expr<T>* condition, Stmt<T>* body) {
+			this->condition = condition;
+			this->body = body;
+		}
+
+		T accept(StmtVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "While";
+		}
+};
+
 // visitor interface
 template <typename T>
 class StmtVisitor {
@@ -114,6 +133,7 @@ class StmtVisitor {
 		virtual T visit(If<T>* stmt) = 0;
 		virtual T visit(Print<T>* stmt) = 0;
 		virtual T visit(Var<T>* stmt) = 0;
+		virtual T visit(While<T>* stmt) = 0;
 };
 
 template <typename T>
