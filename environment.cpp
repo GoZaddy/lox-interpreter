@@ -1,57 +1,60 @@
-#ifndef ENVIRONMENT_H
-#define ENVIRONMENT_H
+#include "environment.h"
 
-#include <unordered_map>
-#include <string>
-#include "token.h"
-#include "util.h"
 
-typedef std::string string;
+LoxCallable* Environment::getCallable(string key){
+    if (funcMap.find(key) != funcMap.end()){
+        return funcMap[key];
+    }
 
-class Environment {
-    private:
-        std::unordered_map<string, string> values;
-        Environment* enclosing;
+    if (enclosing != nullptr) return enclosing->getCallable(key);
 
-    public:
-        Environment(){
-            enclosing = nullptr;
-        }
-         Environment(Environment* enclosing) {
-            this->enclosing = enclosing;
-        }
+    std::cerr << "internal error: invalid callable key" << key << endl;
+    return nullptr;
+}
 
-        void define(string name, string value){
-            values[name] = value;
-        }
+Environment::Environment(){
+    enclosing = nullptr;
+}
 
-        string get(Token name){
-            if (values.find(name.lexeme) != values.end()){
-                return values[name.lexeme];
-            }
+Environment::Environment(Environment* enclosing) {
+    this->enclosing = enclosing;
+}
 
-            if (enclosing != nullptr) return enclosing->get(name);
+void Environment::define(string name, string value){
+    this->values[name] = value;
+}
 
-            throw Util::runtimeError(
-                name,
-                "Undefined variable '" + name.lexeme + "'."
-            );
-        }
+void Environment::defineFunc(string name, LoxCallable* func){
+    define(name, "()"+name);  // TODO: we should probably implement recursive assign as in assign()
+    funcMap["()"+name] = func;
+}
 
-        void assign(Token name, string value) {
-            if (values.find(name.lexeme) != values.end()) {
-                values[name.lexeme] = value;
-                return;
-            }
+string Environment::get(Token name){
+    if (values.find(name.lexeme) != values.end()){
+        return values[name.lexeme];
+    }
 
-            if (enclosing != nullptr) {
-                enclosing->assign(name, value);
-                return;
-            }
+    if (enclosing != nullptr) return enclosing->get(name);
 
-            throw Util::runtimeError(name,
-                "Undefined variable '" + name.lexeme + "'.");
-        }
-};
+    throw Util::runtimeError(
+        name,
+         "Undefined variable '" + name.lexeme + "'."
+    );
+}
 
-#endif
+
+
+void Environment::assign(Token name, string value) {
+    if (values.find(name.lexeme) != values.end()) {
+        values[name.lexeme] = value;
+        return;
+    }
+
+    if (enclosing != nullptr) {
+        enclosing->assign(name, value);
+        return;
+    }
+
+    throw Util::runtimeError(name,
+        "Undefined variable '" + name.lexeme + "'.");
+}

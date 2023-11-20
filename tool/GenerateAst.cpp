@@ -219,6 +219,7 @@ int main(int argc, char *argv[]){
         "Function   : Token name, std::vector<Token> params, std::vector<Stmt<T>*> body",
         "If         : Expr<T>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch",
         "Print      : Expr<T>* expression",
+        "Return     : Token keyword, Expr<T>* value",
         "Var        : Token name, Expr<T>* initializer",
         "While      : Expr<T>* condition, Stmt<T>* body"
     };

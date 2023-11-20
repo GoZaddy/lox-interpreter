@@ -108,6 +108,25 @@ class Print: public Stmt<T> {
 };
 
 template <typename T>
+class Return: public Stmt<T> {
+	public:
+		Token keyword;
+		Expr<T>* value;
+		Return(Token keyword, Expr<T>* value) {
+			this->keyword = keyword;
+			this->value = value;
+		}
+
+		T accept(StmtVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "Return";
+		}
+};
+
+template <typename T>
 class Var: public Stmt<T> {
 	public:
 		Token name;
@@ -154,6 +173,7 @@ class StmtVisitor {
 		virtual T visit(Function<T>* stmt) = 0;
 		virtual T visit(If<T>* stmt) = 0;
 		virtual T visit(Print<T>* stmt) = 0;
+		virtual T visit(Return<T>* stmt) = 0;
 		virtual T visit(Var<T>* stmt) = 0;
 		virtual T visit(While<T>* stmt) = 0;
 };

@@ -62,7 +62,7 @@ class Parser {
 
         Stmtvp declaration(){
             try {
-                if (match({FUN})) return function("function");
+                if (match({FUN})) return function_stmt("function");
                 if (match({VAR})) return varDeclaration();
 
                 return statement();
@@ -76,6 +76,7 @@ class Parser {
             if (match({FOR})) return forStatement();
             if (match({IF})) return ifStatement();
             if (match({PRINT})) return printStatement();
+            if (match({RETURN})) return returnStatement();
             if (match({WHILE})) return whileStatement();
             if (match({LEFT_BRACE})) return new Blockv(block());
             
@@ -156,6 +157,17 @@ class Parser {
             return stmt;
         }
 
+        Stmtvp returnStatement() {
+            Token keyword = previous();
+            Exprvp value = nullptr;
+            if (!check(SEMICOLON)) {
+                value = expression();
+            }
+
+            consume(SEMICOLON, "Expect ';' after return value.");
+            return new Returnv(keyword, value);
+        }
+
         Stmtvp varDeclaration(){
             Token name = consume(IDENTIFIER, "Expect variable name.");
 
@@ -184,7 +196,7 @@ class Parser {
             return stmt;
         }
 
-        Functionvp function(string kind) {
+        Functionvp function_stmt(string kind) {
             Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
 
             consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");

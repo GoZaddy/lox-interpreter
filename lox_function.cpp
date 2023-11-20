@@ -1,40 +1,35 @@
-#ifndef LOX_FUNCTION
-#define LOX_FUNCTION
+#include "lox_function.h"
 
-#include "lox_callable.cpp"
-#include "stmt.cpp"
-#include "types.h"
-#include "interpreter.cpp"
+LoxFunction::LoxFunction(Functionvp declaration, Environment* closure){
+    this->closure = closure;
+    this->declaration = declaration;
+}
 
-class LoxFunction: public LoxCallable{
-    public:
-        Functionvp declaration;
+rv LoxFunction::call(Interpreter* interpreter, std::vector<rv> arguments){
+    Environment* environment = new Environment(closure);
+    // cout << "environment: " << environment << endl;
+    
+    for (int i = 0; i < declaration->params.size(); i++) {
+        environment->define(
+            declaration->params[i].lexeme,
+            arguments[i]
+        );
+    }
 
-        LoxFunction(Functionvp declaration){
-            this->declaration = declaration;
-        }
+    try {
+        interpreter->executeBlock(declaration->body, environment);
+    } catch (ReturnException returnValue) {
+        delete environment; // free memory
+        return returnValue.value;
+    }
+    
+    return "nil";
+}
 
-        rv call(Interpreter::Interpreter& interpreter, std::vector<rv> arguments){
-            Environment* environment = new Environment(interpreter.globals);
-            for (int i = 0; i < declaration->params.size(); i++) {
-            environment->define(declaration->params[i].lexeme,
-                arguments[i]);
-            }
+int LoxFunction::arity(){
+    return declaration->params.size();
+}
 
-            interpreter.executeBlock(declaration->body, environment);
-            delete environment; // free memory
-            return "";
-        }
-
-        int arity(){
-            return declaration->params.size();
-        }
-
-        std::string toString() {
-            return "<fn " + declaration->name.lexeme + ">";
-        }
-
-
-};
-
-#endif
+std::string LoxFunction::toString() {
+    return "<fn " + declaration->name.lexeme + ">";
+}

@@ -4,12 +4,13 @@
 #include <string>
 #include <vector>
 #include "types.h"
-#include "interpreter.cpp"
+
+class Interpreter;
 
 class LoxCallable{
     public:
         virtual int arity() = 0;
-		virtual rv call(Interpreter::Interpreter& interpreter, std::vector<rv> arguments) = 0;
+		virtual rv call(Interpreter* interpreter, std::vector<rv> arguments) = 0;
 };
 
 #endif

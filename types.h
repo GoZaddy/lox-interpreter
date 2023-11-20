@@ -37,6 +37,8 @@ typedef While<rv> Whilev;
 typedef Whilev* Whilevp;
 typedef Function<rv> Functionv;
 typedef Functionv* Functionvp;
+typedef Return<rv> Returnv;
+typedef Returnv* Returnvp;
 
 
 #endif

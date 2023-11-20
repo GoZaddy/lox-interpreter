@@ -6,14 +6,14 @@
 #include "parser.cpp"
 #include "ast_printer.cpp"
 #include "util.h"
-#include "interpreter.cpp"
+#include "interpreter.h"
 
 using namespace std;
 
 bool Util::hadError = false;
 bool Util::hadRuntimeError = false;
 
-Interpreter::Interpreter interpreter;
+Interpreter interpreter;
  
 void run(string source){
     // get tokens
