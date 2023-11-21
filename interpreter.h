@@ -3,7 +3,6 @@
 
 
 #include <iostream>
-#include "expr.cpp"
 #include "util.h"
 #include <cstdlib>
 #include "types.h"
@@ -17,6 +16,8 @@
 class Interpreter : public ExprVisv, public StmtVisv{
     private:
         Environment* environment; // TODO: I wonder if this causes issues
+
+        std::unordered_map<Exprvp, int> locals;
 
         rv evaluate(Exprvp expr);
         bool isTruthy(rv object);
@@ -37,7 +38,7 @@ class Interpreter : public ExprVisv, public StmtVisv{
 
         void execute(Stmtvp stmt);
 
-        
+        rv lookUpVariable(Token name, Exprvp expr);
 
         
     public:
@@ -84,6 +85,8 @@ class Interpreter : public ExprVisv, public StmtVisv{
         rv visit(Whilevp stmt);
 
         rv visit(Blockvp stmt);
+
+        void resolve(Exprvp expr, int depth);
 
 };
 

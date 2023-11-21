@@ -19,6 +19,8 @@ class Environment{
 
         LoxCallable* getCallable(string key);
 
+        Environment* ancestor(int distance); 
+
     public:
         friend class Interpreter;
 
@@ -33,6 +35,11 @@ class Environment{
         string get(Token name);
 
         void assign(Token name, string value);
+
+        string getAt(int distance, string name);
+
+        void assignAt(int distance, Token name, string value);
+        
 };
 
 #endif

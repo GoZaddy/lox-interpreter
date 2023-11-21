@@ -56,6 +56,10 @@ void Interpreter::execute(Stmtvp stmt){
     stmt->accept(this);
 }
 
+void Interpreter::resolve(Exprvp expr, int depth) {
+    locals[expr] = depth;
+}
+
 Interpreter::Interpreter() {
     globals = new Environment();
     environment = globals;
@@ -85,14 +89,13 @@ void Interpreter::executeBlock(
     } 
     catch(string error){
         std::cerr << error << endl;
-        this->environment = previous;
     }
     catch(ReturnException error){
         this->environment = previous;
         throw error;
-    } catch(...){this->environment = previous;}
+    } catch(...){}
     
-    
+    this->environment = previous;
     
 }
 
@@ -192,7 +195,6 @@ rv Interpreter::visit(Callvp expr) {
 
     std::vector<rv> arguments;
     for (auto argument : expr->arguments) { 
-        // cout << "argument " << evaluate(argument) << endl;
         arguments.push_back(evaluate(argument));
     }
 
@@ -208,12 +210,27 @@ rv Interpreter::visit(Callvp expr) {
 }
 
 rv Interpreter::visit(Variablevp expr){
-    return environment->get(expr->name);
+    return lookUpVariable(expr->name, expr);
+}
+
+rv Interpreter::lookUpVariable(Token name, Exprvp expr) {
+    if (locals.find(expr) != locals.end()) {
+        int distance = locals[expr];
+        return environment->getAt(distance, name.lexeme);
+    } else {
+        return globals->get(name);
+    }
 }
 
 rv Interpreter::visit(Assignvp expr){
     rv value = evaluate(expr->value);
-    environment->assign(expr->name, value);
+    
+    if (locals.find(expr) != locals.end()) {
+        int distance = locals[expr];
+        environment->assignAt(distance, expr->name, value);
+    } else {
+        globals->assign(expr->name, value);
+    }
     return value;
 }
 

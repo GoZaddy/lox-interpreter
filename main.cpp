@@ -6,7 +6,8 @@
 #include "parser.cpp"
 #include "ast_printer.cpp"
 #include "util.h"
-#include "interpreter.h"
+// #include "interpreter.h"
+#include "resolver.h"
 
 using namespace std;
 
@@ -39,6 +40,12 @@ void run(string source){
 
     // AstPrinter asp;
     // cout << asp.print(expression) << endl;
+
+    Resolver resolver(&interpreter);
+    resolver.resolve(statements);
+
+    // Stop if there was a resolution error.
+    if (Util::hadError) return;
 
     interpreter.interpret(statements);
 }

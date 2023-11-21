@@ -4,17 +4,29 @@
 #include "stmt.cpp"
 #include "expr.cpp"
 
+
+
 typedef string rv; // rv - return value for visitor
+
+extern rv null;
+
+
+
+
 typedef ExprVisitor<rv> ExprVisv;
 typedef StmtVisitor<rv> StmtVisv;
 typedef Literal<rv> Litv;
+typedef Literal<rv>* Litvp;
 typedef Logical<rv> Logicalv;
 typedef Logicalv* Logicalvp;
 typedef Grouping<rv> Groupv;
+typedef Grouping<rv>* Groupvp;
 typedef Expr<rv> Exprv;
 typedef Expr<rv>* Exprvp;
 typedef Unary<rv> Unav;
+typedef Unary<rv>* Unavp;
 typedef Binary<rv> Binv;
+typedef Binary<rv>* Binvp;
 typedef Call<rv> Callv;
 typedef Callv* Callvp;
 typedef Variable<rv> Variablev;

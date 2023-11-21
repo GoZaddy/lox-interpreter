@@ -7,7 +7,6 @@ LoxFunction::LoxFunction(Functionvp declaration, Environment* closure){
 
 rv LoxFunction::call(Interpreter* interpreter, std::vector<rv> arguments){
     Environment* environment = new Environment(closure);
-    // cout << "environment: " << environment << endl;
     
     for (int i = 0; i < declaration->params.size(); i++) {
         environment->define(
@@ -19,7 +18,7 @@ rv LoxFunction::call(Interpreter* interpreter, std::vector<rv> arguments){
     try {
         interpreter->executeBlock(declaration->body, environment);
     } catch (ReturnException returnValue) {
-        delete environment; // free memory
+        // delete environment; // free memory // commenting out so closures can work
         return returnValue.value;
     }
     
