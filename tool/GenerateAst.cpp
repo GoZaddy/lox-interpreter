@@ -168,6 +168,8 @@ void defineAst(
     fileStream << "class " << baseName << "Visitor;" << endl << endl << endl;
 
 
+    std::vector<pair<string, string>> parsedSubClasses;
+
 
     for (auto type : subtypes){
         int colonIndex = type.find(':');
@@ -175,7 +177,20 @@ void defineAst(
         string className;
         helperStream >> className;
         string fields = type.substr(colonIndex+1, type.size()-colonIndex-1);
-        defineType(fileStream, baseName, className, fields);
+
+        
+
+        parsedSubClasses.push_back({className, fields});
+
+        // forward declaration of subclasses
+        fileStream << "template <typename T>" << endl;
+        fileStream << "class " << className << ";" << endl << endl << endl;
+
+        
+    }
+
+    for (auto parsedSubclass : parsedSubClasses){
+        defineType(fileStream, baseName, parsedSubclass.first, parsedSubclass.second);
     }
 
     defineVisitor(fileStream, baseName, subtypes);
@@ -203,6 +218,7 @@ int main(int argc, char *argv[]){
       "Assign   : Token name, Expr<T>* value",
       "Binary   : Expr<T>* left, Token operatorToken, Expr<T>* right",
       "Call     : Expr<T>* callee, Token paren, std::vector<Expr<T>*> arguments",
+      "Get      : Expr<T>* object, Token name",
       "Grouping : Expr<T>* expression",
       "Literal  : string value",
       "Logical  : Expr<T>* left, Token operatorToken, Expr<T>* right",
@@ -215,6 +231,7 @@ int main(int argc, char *argv[]){
 
     vector<string> statementSubtypes = {
         "Block      : std::vector<Stmt<T>*> statements",
+        "Class      : Token name, std::vector<Function<T>*> methods",
         "Expression : Expr<T>* expression",
         "Function   : Token name, std::vector<Token> params, std::vector<Stmt<T>*> body",
         "If         : Expr<T>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch",

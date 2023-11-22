@@ -1,4 +1,7 @@
-#include "interpreter.h"
+// #include "interpreter.h"
+// #include "lox_class.cpp"
+
+#include "declr.h"
 
 rv Interpreter::evaluate(Exprvp expr){
     rv value = expr->accept(this);
@@ -25,6 +28,24 @@ bool Interpreter::isNumberLiteral(string literal){
 bool Interpreter::isCallable(string expr){
     if (expr.size() > 2){
         if (expr[0] == '(' && expr[1] == ')'){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Interpreter::isClass(string expr){
+    if (expr.size() > 7){
+        if (expr.substr(0,7) == "(class)"){
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Interpreter::isInstance(string expr){
+    if (expr.size() > 10){
+        if (expr.substr(0,10) == "(instance)"){
             return true;
         }
     }
@@ -189,17 +210,28 @@ rv Interpreter::visit(Binv* expr){
 rv Interpreter::visit(Callvp expr) {
     rv callee = evaluate(expr->callee);
 
-    if (!isCallable(callee)){
+   
+
+    if (!isCallable(callee) && !isClass(callee)){
         throw Util::runtimeError(expr->paren, "Can only call functions and classes.");
     }
+
+    
 
     std::vector<rv> arguments;
     for (auto argument : expr->arguments) { 
         arguments.push_back(evaluate(argument));
     }
 
+    LoxCallable* func;
 
-    LoxCallable* func = environment->getCallable(callee); // figure this out
+    if (isCallable(callee)){
+        func = environment->getCallable(callee);;
+    } else {
+        // is class
+        func = environment->getClass(callee);
+    }
+
 
     if (arguments.size() != func->arity()) {
         throw Util::runtimeError(expr->paren, "Expected " +
@@ -208,6 +240,17 @@ rv Interpreter::visit(Callvp expr) {
     }
     return func->call(this, arguments);
 }
+
+rv Interpreter::visit(Getvp expr) {
+    rv object = evaluate(expr->object);
+    if (isInstance(object)) {
+        return environment->getInstance(object)->get(expr->name.lexeme);
+    }
+
+    throw Util::runtimeError(expr->name,
+        "Only instances have properties.");
+}
+
 
 rv Interpreter::visit(Variablevp expr){
     return lookUpVariable(expr->name, expr);
@@ -255,8 +298,15 @@ rv Interpreter::visit(Ifvp stmt) {
 
 rv Interpreter::visit(Printvp stmt){
     rv value = evaluate(stmt->expression);
+    if (isClass(value)){
+        std::cout << environment->getClass(value)->toString() << endl;
+        return null;
+    } else if (isInstance(value)){
+        std::cout << environment->getInstance(value)->toString() << endl;
+        return null;
+    }
     std::cout << value << endl;
-    return "";
+    return null;
 }
 
 rv Interpreter::visit(Returnvp stmt) {
@@ -287,4 +337,11 @@ rv Interpreter::visit(Blockvp stmt) {
     Environment* newEnv = new Environment(environment); 
     executeBlock(stmt->statements, newEnv);
     return "";
+}
+
+rv Interpreter::visit(Classvp stmt) {
+    environment->define(stmt->name.lexeme, null);
+    LoxClass* klass = new LoxClass(stmt->name.lexeme);
+    environment->addClass(stmt->name.lexeme, klass); 
+    return null;
 }

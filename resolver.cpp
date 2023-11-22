@@ -1,5 +1,6 @@
-#include "resolver.h"
+// #include "resolver.h"
 
+#include "declr.h"
 
 
 rv null = "";
@@ -40,6 +41,12 @@ rv Resolver::visit(Blockvp stmt) {
     return null;
 }
 
+rv Resolver::visit(Classvp stmt) {
+    declare(stmt->name);
+    define(stmt->name);
+    return null;
+}
+
 rv Resolver::visit(Varvp stmt) {
     declare(stmt->name);
     if (stmt->initializer != nullptr) {
@@ -67,12 +74,10 @@ void Resolver::define(Token name) {
 }
 
 rv Resolver::visit(Variablevp expr) {
+    if (scopes->empty()) return null;
     if (
-        !scopes->empty() &&
-        (
-            scopes->peek()->find(expr->name.lexeme) != scopes->peek()->end() &&
-            scopes->peek()->at(expr->name.lexeme) == false
-        )
+        scopes->peek()->find(expr->name.lexeme) != scopes->peek()->end() &&
+        scopes->peek()->at(expr->name.lexeme) == false
     ) {
         Util::error(expr->name,
             "Can't read local variable in its own initializer.");
@@ -194,6 +199,11 @@ rv Resolver:: visit(Logicalvp expr) {
 
 rv Resolver:: visit(Unavp expr) {
     resolve(expr->right);
+    return null;
+}
+
+rv Resolver::visit(Getvp expr) {
+    resolve(expr->object);
     return null;
 }
 

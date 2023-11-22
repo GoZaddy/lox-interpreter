@@ -15,6 +15,42 @@ class StmtVisitor;
 
 
 template <typename T>
+class Block;
+
+
+template <typename T>
+class Class;
+
+
+template <typename T>
+class Expression;
+
+
+template <typename T>
+class Function;
+
+
+template <typename T>
+class If;
+
+
+template <typename T>
+class Print;
+
+
+template <typename T>
+class Return;
+
+
+template <typename T>
+class Var;
+
+
+template <typename T>
+class While;
+
+
+template <typename T>
 class Block: public Stmt<T> {
 	public:
 		std::vector<Stmt<T>*> statements;
@@ -28,6 +64,25 @@ class Block: public Stmt<T> {
 
 		string getType() {
 			return "Block";
+		}
+};
+
+template <typename T>
+class Class: public Stmt<T> {
+	public:
+		Token name;
+		std::vector<Function<T>*> methods;
+		Class(Token name, std::vector<Function<T>*> methods) {
+			this->name = name;
+			this->methods = methods;
+		}
+
+		T accept(StmtVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "Class";
 		}
 };
 
@@ -169,6 +224,7 @@ template <typename T>
 class StmtVisitor {
 	public:
 		virtual T visit(Block<T>* stmt) = 0;
+		virtual T visit(Class<T>* stmt) = 0;
 		virtual T visit(Expression<T>* stmt) = 0;
 		virtual T visit(Function<T>* stmt) = 0;
 		virtual T visit(If<T>* stmt) = 0;

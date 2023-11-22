@@ -3,13 +3,12 @@
 
 #include <vector>
 #include <iostream>
-
 #include "token.h"
 #include "expr.cpp"
 #include "util.h"
 #include "stmt.cpp"
-
 #include "types.h"
+
 
 class Parser {
     private:
@@ -62,6 +61,7 @@ class Parser {
 
         Stmtvp declaration(){
             try {
+                if (match({CLASS})) return classDeclaration();
                 if (match({FUN})) return function_stmt("function");
                 if (match({VAR})) return varDeclaration();
 
@@ -70,6 +70,21 @@ class Parser {
                 synchronize();
                 return nullptr;
             }
+        }
+
+        Stmtvp classDeclaration() {
+            Token name = consume(IDENTIFIER, "Expect class name.");
+            consume(LEFT_BRACE, "Expect '{' before class body.");
+
+            std::vector<Functionvp> methods;
+            while (!check(RIGHT_BRACE) && !isAtEnd()) {
+                methods.push_back((Functionvp) function_stmt("method"));
+            }
+
+            consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+            Classvp res = new Classv(name, methods);
+            return res;
         }
 
         Stmtvp statement() {
@@ -370,6 +385,10 @@ class Parser {
             while (true) { 
                 if (match({LEFT_PAREN})) {
                     expr = finishCall(expr);
+                } else if (match({DOT})){
+                    Token name = consume(IDENTIFIER,
+                        "Expect property name after '.'.");
+                    expr = new Getv(expr, name);
                 } else {
                     break;
                 }

@@ -74,6 +74,10 @@ class Resolver: ExprVisv, StmtVisv {
 
         rv visit(Blockvp stmt);
 
+        rv visit(Classvp stmt); 
+
+        rv visit(Getvp expr);
+
 };
 
 

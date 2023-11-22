@@ -1,4 +1,8 @@
-#include "environment.h"
+// #include "environment.h"
+#include <sstream>
+
+#include "declr.h"
+
 
 
 LoxCallable* Environment::getCallable(string key){
@@ -9,6 +13,30 @@ LoxCallable* Environment::getCallable(string key){
     if (enclosing != nullptr) return enclosing->getCallable(key);
 
     std::cerr << "internal error: invalid callable key" << key << endl;
+    return nullptr;
+}
+
+
+LoxClass* Environment::getClass(string key){
+    if (classMap.find(key) != classMap.end()){
+        return classMap[key];
+    }
+
+    if (enclosing != nullptr) return enclosing->getClass(key);
+
+    std::cerr << "internal error: invalid class key" << key << endl;
+    return nullptr;
+}
+
+
+LoxInstance* Environment::getInstance(string key){
+    if (instanceMap.find(key) != instanceMap.end()){
+        return instanceMap[key];
+    }
+
+    if (enclosing != nullptr) return enclosing->getInstance(key);
+
+    std::cerr << "internal error: invalid class key" << key << endl;
     return nullptr;
 }
 
@@ -75,3 +103,21 @@ void Environment::assign(Token name, string value) {
     throw Util::runtimeError(name,
         "Undefined variable '" + name.lexeme + "'.");
 }
+
+
+void Environment::addClass(string name, LoxClass* klass){
+    string key = "(class)"+name;
+    define(name, key);  // TODO: we should probably implement recursive assign as in assign()
+    classMap[key] = klass;
+}
+
+string Environment::addInstance(LoxInstance* instance){
+    stringstream ss;
+    ss << "(instance) " << instance;
+
+    instanceMap[ss.str()] = instance;
+
+    return ss.str();
+}
+
+

@@ -5,7 +5,6 @@
 #include <vector>
 #include "types.h"
 
-class Interpreter;
 
 class LoxCallable{
     public:

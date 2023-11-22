@@ -4,10 +4,12 @@
 
 #include "scanner.h"
 #include "parser.cpp"
-#include "ast_printer.cpp"
+// #include "ast_printer.cpp"
 #include "util.h"
 // #include "interpreter.h"
-#include "resolver.h"
+// #include "resolver.h"
+
+#include "declr.h"
 
 using namespace std;
 

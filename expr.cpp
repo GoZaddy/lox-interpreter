@@ -14,6 +14,42 @@ class ExprVisitor;
 
 
 template <typename T>
+class Assign;
+
+
+template <typename T>
+class Binary;
+
+
+template <typename T>
+class Call;
+
+
+template <typename T>
+class Get;
+
+
+template <typename T>
+class Grouping;
+
+
+template <typename T>
+class Literal;
+
+
+template <typename T>
+class Logical;
+
+
+template <typename T>
+class Unary;
+
+
+template <typename T>
+class Variable;
+
+
+template <typename T>
 class Assign: public Expr<T> {
 	public:
 		Token name;
@@ -71,6 +107,25 @@ class Call: public Expr<T> {
 
 		string getType() {
 			return "Call";
+		}
+};
+
+template <typename T>
+class Get: public Expr<T> {
+	public:
+		Expr<T>* object;
+		Token name;
+		Get(Expr<T>* object, Token name) {
+			this->object = object;
+			this->name = name;
+		}
+
+		T accept(ExprVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "Get";
 		}
 };
 
@@ -172,6 +227,7 @@ class ExprVisitor {
 		virtual T visit(Assign<T>* expr) = 0;
 		virtual T visit(Binary<T>* expr) = 0;
 		virtual T visit(Call<T>* expr) = 0;
+		virtual T visit(Get<T>* expr) = 0;
 		virtual T visit(Grouping<T>* expr) = 0;
 		virtual T visit(Literal<T>* expr) = 0;
 		virtual T visit(Logical<T>* expr) = 0;

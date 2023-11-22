@@ -21,6 +21,8 @@ typedef Logical<rv> Logicalv;
 typedef Logicalv* Logicalvp;
 typedef Grouping<rv> Groupv;
 typedef Grouping<rv>* Groupvp;
+typedef Get<rv> Getv;
+typedef Getv* Getvp;
 typedef Expr<rv> Exprv;
 typedef Expr<rv>* Exprvp;
 typedef Unary<rv> Unav;
@@ -51,6 +53,8 @@ typedef Function<rv> Functionv;
 typedef Functionv* Functionvp;
 typedef Return<rv> Returnv;
 typedef Returnv* Returnvp;
+typedef Class<rv> Classv;
+typedef Classv* Classvp;
 
 
 #endif

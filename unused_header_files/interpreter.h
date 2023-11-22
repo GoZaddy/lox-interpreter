@@ -13,6 +13,8 @@
 #include "lox_function.h"
 #include "return.cpp"
 
+class LoxClass;
+
 class Interpreter : public ExprVisv, public StmtVisv{
     private:
         Environment* environment; // TODO: I wonder if this causes issues
@@ -27,6 +29,10 @@ class Interpreter : public ExprVisv, public StmtVisv{
         bool isNumberLiteral(string literal);
 
         bool isCallable(string expr);
+
+        bool isClass(string expr);
+
+        bool isInstance(string expr);
 
         bool isEqual(rv a, rv b);
 
@@ -43,6 +49,8 @@ class Interpreter : public ExprVisv, public StmtVisv{
         
     public:
         Environment* globals;
+
+        friend class LoxClass;
         
 
         Interpreter();
@@ -85,6 +93,8 @@ class Interpreter : public ExprVisv, public StmtVisv{
         rv visit(Whilevp stmt);
 
         rv visit(Blockvp stmt);
+
+        rv visit(Classvp stmt);
 
         void resolve(Exprvp expr, int depth);
 
