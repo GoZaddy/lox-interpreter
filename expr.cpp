@@ -46,6 +46,10 @@ class Set;
 
 
 template <typename T>
+class Super;
+
+
+template <typename T>
 class This;
 
 
@@ -214,6 +218,25 @@ class Set: public Expr<T> {
 };
 
 template <typename T>
+class Super: public Expr<T> {
+	public:
+		Token keyword;
+		Token method;
+		Super(Token keyword, Token method) {
+			this->keyword = keyword;
+			this->method = method;
+		}
+
+		T accept(ExprVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "Super";
+		}
+};
+
+template <typename T>
 class This: public Expr<T> {
 	public:
 		Token keyword;
@@ -278,6 +301,7 @@ class ExprVisitor {
 		virtual T visit(Literal<T>* expr) = 0;
 		virtual T visit(Logical<T>* expr) = 0;
 		virtual T visit(Set<T>* expr) = 0;
+		virtual T visit(Super<T>* expr) = 0;
 		virtual T visit(This<T>* expr) = 0;
 		virtual T visit(Unary<T>* expr) = 0;
 		virtual T visit(Variable<T>* expr) = 0;

@@ -223,6 +223,7 @@ int main(int argc, char *argv[]){
       "Literal  : string value",
       "Logical  : Expr<T>* left, Token operatorToken, Expr<T>* right",
       "Set      : Expr<T>* object, Token name, Expr<T>* value",
+      "Super    : Token keyword, Token method",
       "This     : Token keyword",
       "Unary    : Token operatorToken, Expr<T>* right",
       "Variable : Token name"
@@ -233,7 +234,7 @@ int main(int argc, char *argv[]){
 
     vector<string> statementSubtypes = {
         "Block      : std::vector<Stmt<T>*> statements",
-        "Class      : Token name, std::vector<Function<T>*> methods",
+        "Class      : Token name, Variable<T>* superclass, std::vector<Function<T>*> methods",
         "Expression : Expr<T>* expression",
         "Function   : Token name, std::vector<Token> params, std::vector<Stmt<T>*> body",
         "If         : Expr<T>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch",

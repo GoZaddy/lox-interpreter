@@ -49,6 +49,27 @@ rv Resolver::visit(Classvp stmt) {
     declare(stmt->name);
     define(stmt->name);
 
+
+    if (
+        stmt->superclass != nullptr &&
+        (stmt->name.lexeme == stmt->superclass->name.lexeme)
+    ) {
+        Util::error(
+            stmt->superclass->name,
+            "A class can't inherit from itself."
+        );
+    }
+
+    if (stmt->superclass != nullptr) {
+        currentClass = SUBCLASS;
+        resolve(stmt->superclass);
+    }
+
+    if (stmt->superclass != nullptr) {
+      beginScope();
+      (*(scopes->peek()))["super"] = true;
+    }
+
     beginScope();
     (*(scopes->peek()))["this"] = true;
 
@@ -59,6 +80,8 @@ rv Resolver::visit(Classvp stmt) {
         }
         resolveFunction(method, declaration); 
     }
+
+    if (stmt->superclass != nullptr) endScope();
 
     endScope();
     currentClass = enclosingClass;
@@ -108,7 +131,6 @@ rv Resolver::visit(Variablevp expr) {
 void Resolver::resolveLocal(Exprvp expr, Token name) {
     Mapsb* currScope = scopes->peek();
     for (int i = scopes->size() - 1; i >= 0; i--) {
-        // TODO: MIGHT BE BUGGY - JUST INTUITION
         if (scopes->at(i)->find(name.lexeme) != scopes->at(i)->end()) {
             interpreter->resolve(expr, scopes->size() - 1 - i);
             return;
@@ -234,6 +256,18 @@ rv Resolver::visit(Getvp expr) {
 rv Resolver::visit(Setvp expr) {
     resolve(expr->value);
     resolve(expr->object);
+    return null;
+}
+
+rv Resolver::visit(Supervp expr) {\
+    if (currentClass == NONE_CLASS) {
+      Util::error(expr->keyword,
+          "Can't use 'super' outside of a class.");
+    } else if (currentClass != SUBCLASS) {
+      Util::error(expr->keyword,
+          "Can't use 'super' in a class with no superclass.");
+    }
+    resolveLocal(expr, expr->keyword);
     return null;
 }
 

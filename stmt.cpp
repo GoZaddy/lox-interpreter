@@ -71,9 +71,11 @@ template <typename T>
 class Class: public Stmt<T> {
 	public:
 		Token name;
+		Variable<T>* superclass;
 		std::vector<Function<T>*> methods;
-		Class(Token name, std::vector<Function<T>*> methods) {
+		Class(Token name, Variable<T>* superclass, std::vector<Function<T>*> methods) {
 			this->name = name;
+			this->superclass = superclass;
 			this->methods = methods;
 		}
 

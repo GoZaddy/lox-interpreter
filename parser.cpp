@@ -74,6 +74,13 @@ class Parser {
 
         Stmtvp classDeclaration() {
             Token name = consume(IDENTIFIER, "Expect class name.");
+            Variablevp superclass = nullptr;
+
+            if (match({LESS})) {
+                consume(IDENTIFIER, "Expect superclass name.");
+                superclass = new Variablev(previous());
+            }
+
             consume(LEFT_BRACE, "Expect '{' before class body.");
 
             std::vector<Functionvp> methods;
@@ -83,7 +90,7 @@ class Parser {
 
             consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-            Classvp res = new Classv(name, methods);
+            Classvp res = new Classv(name, superclass, methods);
             return res;
         }
 
@@ -425,6 +432,16 @@ class Parser {
                 res = temp;
 
                 return res;
+            }
+
+            if (match({SUPER})) {
+                Token keyword = previous();
+                consume(DOT, "Expect '.' after 'super'.");
+                Token method = consume(
+                    IDENTIFIER,
+                    "Expect superclass method name."
+                );
+                return new Superv(keyword, method);
             }
 
             if (match({THIS})) return new Thisv(previous());

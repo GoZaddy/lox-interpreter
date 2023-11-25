@@ -35,6 +35,8 @@ typedef Call<rv> Callv;
 typedef Callv* Callvp;
 typedef This<rv> Thisv;
 typedef Thisv* Thisvp;
+typedef Super<rv> Superv;
+typedef Superv* Supervp;
 typedef Variable<rv> Variablev;
 typedef Variablev* Variablevp;
 typedef Assign<rv> Assignv;

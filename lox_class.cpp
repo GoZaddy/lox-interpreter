@@ -4,9 +4,10 @@
 
 
 
-LoxClass::LoxClass(std::string name, std::unordered_map<string, LoxFunction*> methods) {
+LoxClass::LoxClass(std::string name, LoxClass* superclass, std::unordered_map<string, LoxFunction*> methods) {
     this->name = name;
     this->methods = methods;
+    this->superclass = superclass;
 }
 
 std::string LoxClass::toString() {
@@ -29,6 +30,10 @@ rv LoxClass::findMethod(string name) {
     // class_key => (class)class_name
     if (methods.find(name) != methods.end()) {
         return "(.) (class)"+this->name+" "+name;
+    }
+
+    if (superclass != nullptr) {
+      return superclass->findMethod(name);
     }
 
     return null;

@@ -52,7 +52,7 @@ LoxInstance* Environment::getInstance(string key){
 
     if (enclosing != nullptr) return enclosing->getInstance(key);
 
-    std::cerr << "internal error: invalid class key" << key << endl;
+    std::cerr << "internal error: invalid class instance key" << key << endl;
     return nullptr;
 }
 

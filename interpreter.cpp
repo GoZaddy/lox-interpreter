@@ -389,7 +389,23 @@ rv Interpreter::visit(Blockvp stmt) {
 }
 
 rv Interpreter::visit(Classvp stmt) {
+    rv superclass = null;
+    if (stmt->superclass != nullptr) {
+        superclass = evaluate(stmt->superclass);
+        if (!isClass(superclass)) {
+            throw Util::runtimeError(
+                stmt->superclass->name,
+                "Superclass must be a class."
+            );
+        }
+    }
+
     environment->define(stmt->name.lexeme, null);
+
+    if (stmt->superclass != nullptr) {
+        environment = new Environment(environment);
+        environment->define("super", superclass);
+    }
 
     std::unordered_map<std::string, LoxFunction*> methods;
     for (auto method : stmt->methods) {
@@ -397,11 +413,39 @@ rv Interpreter::visit(Classvp stmt) {
         methods[method->name.lexeme] =  function;
     }
 
-    LoxClass* klass = new LoxClass(stmt->name.lexeme, methods);
+    LoxClass* superclassPtr = superclass == null ? nullptr : environment->getClass(superclass);
+
+    LoxClass* klass = new LoxClass(stmt->name.lexeme, superclassPtr, methods);
+
+    if (superclass != null) {
+      environment = environment->enclosing;
+    }
+
     environment->addClass(stmt->name.lexeme, klass); 
     return null;
 }
 
 rv Interpreter::visit(Thisvp expr) {
     return lookUpVariable(expr->keyword, expr);
+}
+
+
+rv Interpreter::visit(Supervp expr) {
+    int distance = locals[expr];
+    LoxClass* superclass = environment->getClass(environment->getAt(
+        distance, "super"));
+
+    LoxInstance* object = environment->getInstance(environment->getAt(
+        distance - 1, "this"));
+
+    rv method_key = superclass->findMethod(expr->method.lexeme);
+    if (method_key == null) {
+      throw Util::runtimeError(expr->method,
+          "Undefined property '" + expr->method.lexeme + "'.");
+    }
+
+    stringstream ss;
+    ss << method_key << " (instance)" << object; 
+    // return key containing class key, method key and instance key
+    return ss.str();
 }

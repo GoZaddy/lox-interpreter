@@ -232,6 +232,8 @@ class Interpreter : public ExprVisv, public StmtVisv{
 
         rv visit(Thisvp expr);
 
+        rv visit(Supervp expr);
+
 };
 
 
@@ -247,13 +249,14 @@ class Interpreter : public ExprVisv, public StmtVisv{
 class LoxClass: public LoxCallable{
     private:
         std::unordered_map<string, LoxFunction*> methods;
+        LoxClass* superclass;
     public:
         friend class Environment;
         friend class LoxInstance;
 
         std::string name;
 
-        LoxClass(std::string name, std::unordered_map<string, LoxFunction*> methods);
+        LoxClass(std::string name, LoxClass* superclass, std::unordered_map<string, LoxFunction*> methods);
 
         std::string toString();
 
@@ -315,7 +318,8 @@ enum FunctionType {
 
 enum ClassType {
     NONE_CLASS,
-    CLASS_
+    CLASS_,
+    SUBCLASS
 };
 
 class Resolver: ExprVisv, StmtVisv {
@@ -387,5 +391,8 @@ class Resolver: ExprVisv, StmtVisv {
         rv visit(Setvp expr);
 
         rv visit(Thisvp expr);
+
+        rv visit(Supervp expr);
+
 
 };
