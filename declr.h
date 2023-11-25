@@ -29,18 +29,18 @@ class LoxCallable{
 
 
 
-
-
-
-
 class LoxFunction: public LoxCallable{
     private:
         Environment* closure;
     public:
         Functionvp declaration;
+
+        bool isInitializer;
         
 
-        LoxFunction(Functionvp declaration, Environment* closure);
+        LoxFunction(Functionvp declaration, Environment* closure, bool isInitializer);
+
+        LoxFunction* bind(LoxInstance* instance);
 
         rv call(Interpreter* interpreter, std::vector<rv> arguments);
 
@@ -95,11 +95,13 @@ class Environment{
 
         LoxClass* getClass(string key);
 
+        LoxCallable* getClassMethod(string key);
+
         LoxInstance* getInstance(string key);
 
         Environment* ancestor(int distance); 
 
-        string addInstance(LoxInstance* instance);
+        
 
     public:
         friend class Interpreter;
@@ -123,6 +125,8 @@ class Environment{
         string getAt(int distance, string name);
 
         void assignAt(int distance, Token name, string value);
+
+        string addInstance(LoxInstance* instance);
         
 };
 
@@ -151,6 +155,8 @@ class Interpreter : public ExprVisv, public StmtVisv{
         bool isNumberLiteral(string literal);
 
         bool isCallable(string expr);
+
+        bool isClassMethod(string expr);
 
         bool isClass(string expr);
 
@@ -198,6 +204,8 @@ class Interpreter : public ExprVisv, public StmtVisv{
 
         rv visit(Getvp expr);
 
+        rv visit(Setvp expr);
+
         rv visit(Variablevp expr);
 
         rv visit(Assignvp expr);
@@ -222,6 +230,8 @@ class Interpreter : public ExprVisv, public StmtVisv{
 
         void resolve(Exprvp expr, int depth);
 
+        rv visit(Thisvp expr);
+
 };
 
 
@@ -235,14 +245,21 @@ class Interpreter : public ExprVisv, public StmtVisv{
 
 
 class LoxClass: public LoxCallable{
+    private:
+        std::unordered_map<string, LoxFunction*> methods;
     public:
+        friend class Environment;
+        friend class LoxInstance;
+
         std::string name;
 
-        LoxClass(std::string name);
+        LoxClass(std::string name, std::unordered_map<string, LoxFunction*> methods);
 
         std::string toString();
 
         rv call(Interpreter* interpreter, std::vector<rv> arguments);
+
+        rv findMethod(string name);
 
         int arity();
 };
@@ -267,7 +284,9 @@ class LoxInstance {
     public:
         LoxInstance(LoxClass* klass);
 
-        string get(string name);
+        string get(Token name);
+
+        void set(Token name, string value);
 
         std::string toString();
 };
@@ -288,8 +307,15 @@ class LoxInstance {
 typedef std::unordered_map<std::string, bool> Mapsb;
 
 enum FunctionType {
-    NONE,
-    FUNCTION
+    NONE_FUNCTION,
+    FUNCTION,
+    INITIALIZER,
+    METHOD
+};
+
+enum ClassType {
+    NONE_CLASS,
+    CLASS_
 };
 
 class Resolver: ExprVisv, StmtVisv {
@@ -299,6 +325,7 @@ class Resolver: ExprVisv, StmtVisv {
         Stack<Mapsb*>* scopes;
 
         FunctionType currentFunction;
+        ClassType currentClass;
 
         void resolve(Stmtvp stmt);
 
@@ -356,5 +383,9 @@ class Resolver: ExprVisv, StmtVisv {
         rv visit(Classvp stmt); 
 
         rv visit(Getvp expr);
+
+        rv visit(Setvp expr);
+
+        rv visit(Thisvp expr);
 
 };

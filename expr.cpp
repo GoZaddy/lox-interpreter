@@ -42,6 +42,14 @@ class Logical;
 
 
 template <typename T>
+class Set;
+
+
+template <typename T>
+class This;
+
+
+template <typename T>
 class Unary;
 
 
@@ -185,6 +193,44 @@ class Logical: public Expr<T> {
 };
 
 template <typename T>
+class Set: public Expr<T> {
+	public:
+		Expr<T>* object;
+		Token name;
+		Expr<T>* value;
+		Set(Expr<T>* object, Token name, Expr<T>* value) {
+			this->object = object;
+			this->name = name;
+			this->value = value;
+		}
+
+		T accept(ExprVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "Set";
+		}
+};
+
+template <typename T>
+class This: public Expr<T> {
+	public:
+		Token keyword;
+		This(Token keyword) {
+			this->keyword = keyword;
+		}
+
+		T accept(ExprVisitor<T>* visitor) {
+			return visitor->visit(this);
+		}
+
+		string getType() {
+			return "This";
+		}
+};
+
+template <typename T>
 class Unary: public Expr<T> {
 	public:
 		Token operatorToken;
@@ -231,6 +277,8 @@ class ExprVisitor {
 		virtual T visit(Grouping<T>* expr) = 0;
 		virtual T visit(Literal<T>* expr) = 0;
 		virtual T visit(Logical<T>* expr) = 0;
+		virtual T visit(Set<T>* expr) = 0;
+		virtual T visit(This<T>* expr) = 0;
 		virtual T visit(Unary<T>* expr) = 0;
 		virtual T visit(Variable<T>* expr) = 0;
 };

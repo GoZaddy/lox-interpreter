@@ -1,3 +1,8 @@
-class Bagel {}
-var bagel = Bagel();
-print bagel; // Prints "Bagel instance".
+class Foo {
+    init() {
+      print this;
+    }
+  }
+  
+  var foo = Foo();
+  print foo.init();

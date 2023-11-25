@@ -25,7 +25,7 @@ class Parser {
         }
 
         Token previous(){
-            if (current == 0) {cout << "invalid call to previous() because current is 0" << endl;}
+            if (current == 0) {cerr << "invalid call to previous() because current is 0" << endl;}
             return tokens[current-1];
         }
 
@@ -255,6 +255,9 @@ class Parser {
                 if (expr->getType() == "Variable") {
                     Token name = ((Variablevp) expr)->name;
                     return new Assignv(name, value);
+                } else if (expr->getType() == "Get"){
+                    Getvp get = (Getvp)expr;
+                    return new Setv(get->object, get->name, value);
                 }
 
                 Util::error(equals, "Invalid assignment target."); 
@@ -423,6 +426,8 @@ class Parser {
 
                 return res;
             }
+
+            if (match({THIS})) return new Thisv(previous());
 
             if (match({IDENTIFIER})){
                 res = new Variablev(previous());

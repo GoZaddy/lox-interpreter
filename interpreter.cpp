@@ -2,6 +2,14 @@
 // #include "lox_class.cpp"
 
 #include "declr.h"
+#include <sstream>
+
+
+// Looking back, I probably could have created helper classes similar to Stmt and Expr or even somehow
+// used both those classes to represent the return type of these evaluate() expressions
+// i.e create a pure virtual class that expr and stmt derive from and use a pointer
+// to that virtual class as the return type for the evaluate function. We can then cast that type as we 
+// need to more specific types
 
 rv Interpreter::evaluate(Exprvp expr){
     rv value = expr->accept(this);
@@ -27,10 +35,22 @@ bool Interpreter::isNumberLiteral(string literal){
 
 bool Interpreter::isCallable(string expr){
     if (expr.size() > 2){
-        if (expr[0] == '(' && expr[1] == ')'){
+        if (expr.substr(0,2) == "()" || (expr.substr(0,3) == "(.)")){
             return true;
         }
     }
+    return false;
+}
+
+
+bool Interpreter::isClassMethod(string expr){
+    if (isCallable(expr)){
+        if (expr.find('.') != std::string::npos){
+            return true;
+        }
+    }
+
+
     return false;
 }
 
@@ -137,6 +157,23 @@ rv Interpreter::visit(Logicalvp expr) {
     return evaluate(expr->right);
 }
 
+rv Interpreter::visit(Setvp expr) {
+    
+    rv object = evaluate(expr->object);
+
+
+    if (!isInstance(object)) { 
+        throw Util::runtimeError(
+            expr->name,
+            "Only instances have fields."
+        );
+    }
+
+    rv value = evaluate(expr->value);
+    (environment->getInstance(object))->set(expr->name, value);
+    return value;
+  }
+
 rv Interpreter::visit(Groupv* expr){
     return evaluate(expr->expression);
 }
@@ -209,7 +246,6 @@ rv Interpreter::visit(Binv* expr){
 
 rv Interpreter::visit(Callvp expr) {
     rv callee = evaluate(expr->callee);
-
    
 
     if (!isCallable(callee) && !isClass(callee)){
@@ -225,8 +261,21 @@ rv Interpreter::visit(Callvp expr) {
 
     LoxCallable* func;
 
+
     if (isCallable(callee)){
-        func = environment->getCallable(callee);;
+        if (isClassMethod(callee)){
+            // todo: figure out a way to get instance key here
+            // we can just call bind here 
+            stringstream ss(callee);
+            string className, methodName, instanceKey;
+            ss >> className >> className >> methodName >> instanceKey;
+
+            
+            func = environment->getClassMethod("(.) "+ className+" "+methodName);
+            func = ((LoxFunction*) func)->bind(environment->getInstance(instanceKey));
+        } else {
+            func = environment->getCallable(callee);
+        }
     } else {
         // is class
         func = environment->getClass(callee);
@@ -244,7 +293,7 @@ rv Interpreter::visit(Callvp expr) {
 rv Interpreter::visit(Getvp expr) {
     rv object = evaluate(expr->object);
     if (isInstance(object)) {
-        return environment->getInstance(object)->get(expr->name.lexeme);
+        return environment->getInstance(object)->get(expr->name);
     }
 
     throw Util::runtimeError(expr->name,
@@ -282,7 +331,7 @@ rv Interpreter::visit(Expressionvp stmt){
 }
 
 rv Interpreter::visit(Functionvp stmt){
-    LoxCallable* func = new LoxFunction(stmt, environment);
+    LoxCallable* func = new LoxFunction(stmt, environment, false);
     environment->defineFunc(stmt->name.lexeme, func); // come up with our solution for this
     return "";
 }
@@ -341,7 +390,18 @@ rv Interpreter::visit(Blockvp stmt) {
 
 rv Interpreter::visit(Classvp stmt) {
     environment->define(stmt->name.lexeme, null);
-    LoxClass* klass = new LoxClass(stmt->name.lexeme);
+
+    std::unordered_map<std::string, LoxFunction*> methods;
+    for (auto method : stmt->methods) {
+        LoxFunction* function = new LoxFunction(method, environment, method->name.lexeme == "init");
+        methods[method->name.lexeme] =  function;
+    }
+
+    LoxClass* klass = new LoxClass(stmt->name.lexeme, methods);
     environment->addClass(stmt->name.lexeme, klass); 
     return null;
+}
+
+rv Interpreter::visit(Thisvp expr) {
+    return lookUpVariable(expr->keyword, expr);
 }

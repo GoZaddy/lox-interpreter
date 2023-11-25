@@ -222,6 +222,8 @@ int main(int argc, char *argv[]){
       "Grouping : Expr<T>* expression",
       "Literal  : string value",
       "Logical  : Expr<T>* left, Token operatorToken, Expr<T>* right",
+      "Set      : Expr<T>* object, Token name, Expr<T>* value",
+      "This     : Token keyword",
       "Unary    : Token operatorToken, Expr<T>* right",
       "Variable : Token name"
     };

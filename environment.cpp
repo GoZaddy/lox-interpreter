@@ -16,6 +16,22 @@ LoxCallable* Environment::getCallable(string key){
     return nullptr;
 }
 
+LoxCallable* Environment::getClassMethod(string key){
+    // format for class method key => (.) className methodName
+    stringstream ss(key);
+    string classKey, methodName;
+    ss >> classKey >> classKey >> methodName;
+    
+    LoxClass* klass = getClass(classKey);
+
+    if (klass->methods.find(methodName) != klass->methods.end()){
+        return klass->methods[methodName];
+    }
+
+    std::cerr << "internal error: invalid class method key" << key << endl;
+    return nullptr;
+}
+
 
 LoxClass* Environment::getClass(string key){
     if (classMap.find(key) != classMap.end()){
@@ -113,7 +129,7 @@ void Environment::addClass(string name, LoxClass* klass){
 
 string Environment::addInstance(LoxInstance* instance){
     stringstream ss;
-    ss << "(instance) " << instance;
+    ss << "(instance)" << instance;
 
     instanceMap[ss.str()] = instance;
 

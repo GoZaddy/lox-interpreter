@@ -10,7 +10,8 @@ typedef std::unordered_map<std::string, bool> Mapsb;
 
 enum FunctionType {
     NONE,
-    FUNCTION
+    FUNCTION,
+    METHOD
 };
 
 class Resolver: ExprVisv, StmtVisv {

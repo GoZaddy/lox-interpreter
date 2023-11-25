@@ -3,9 +3,18 @@
 #include "declr.h"
 
 
-LoxFunction::LoxFunction(Functionvp declaration, Environment* closure){
+LoxFunction::LoxFunction(Functionvp declaration, Environment* closure, bool isInitializer){
+    this->isInitializer = isInitializer;
     this->closure = closure;
     this->declaration = declaration;
+}
+
+
+LoxFunction* LoxFunction::bind(LoxInstance* instance) {
+    Environment* environment = new Environment(closure);
+    string instance_key = environment->addInstance(instance);
+    environment->define("this", instance_key);
+    return new LoxFunction(declaration, environment, isInitializer);
 }
 
 rv LoxFunction::call(Interpreter* interpreter, std::vector<rv> arguments){
@@ -21,10 +30,12 @@ rv LoxFunction::call(Interpreter* interpreter, std::vector<rv> arguments){
     try {
         interpreter->executeBlock(declaration->body, environment);
     } catch (ReturnException returnValue) {
+        if (isInitializer) return closure->getAt(0, "this");
         // delete environment; // free memory // commenting out so closures can work
         return returnValue.value;
     }
     
+    if (isInitializer) return closure->getAt(0, "this");
     return "nil";
 }
 

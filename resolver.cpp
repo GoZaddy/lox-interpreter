@@ -7,7 +7,8 @@ rv null = "";
 
 Resolver::Resolver(Interpreter* interpreter) {
     this->interpreter = interpreter;
-    this->currentFunction = NONE;
+    this->currentFunction = NONE_FUNCTION;
+    this->currentClass = NONE_CLASS;
     this->scopes = new Stack<Mapsb*>();
 }
 
@@ -42,8 +43,25 @@ rv Resolver::visit(Blockvp stmt) {
 }
 
 rv Resolver::visit(Classvp stmt) {
+    ClassType enclosingClass = currentClass;
+    currentClass = CLASS_;
+
     declare(stmt->name);
     define(stmt->name);
+
+    beginScope();
+    (*(scopes->peek()))["this"] = true;
+
+    for (auto method : stmt->methods) {
+        FunctionType declaration = METHOD;
+        if (method->name.lexeme == "init"){
+            declaration = INITIALIZER;
+        }
+        resolveFunction(method, declaration); 
+    }
+
+    endScope();
+    currentClass = enclosingClass;
     return null;
 }
 
@@ -148,12 +166,18 @@ rv Resolver::visit(Printvp stmt) {
 }
 
 rv Resolver::visit(Returnvp stmt) {
-    if (currentFunction == NONE) {
+    if (currentFunction == NONE_FUNCTION) {
       Util::error(stmt->keyword, "Can't return from top-level code.");
     }
 
     if (stmt->value != nullptr) {
-      resolve(stmt->value);
+        if (currentFunction == INITIALIZER) {
+            Util::error(
+                stmt->keyword,
+                "Can't return a value from an initializer."
+            );
+        }
+        resolve(stmt->value);
     }
 
     return null;
@@ -207,3 +231,19 @@ rv Resolver::visit(Getvp expr) {
     return null;
 }
 
+rv Resolver::visit(Setvp expr) {
+    resolve(expr->value);
+    resolve(expr->object);
+    return null;
+}
+
+
+rv Resolver::visit(Thisvp expr) {
+    if (currentClass == NONE_CLASS) {
+      Util::error(expr->keyword,
+          "Can't use 'this' outside of a class.");
+      return null;
+    }
+    resolveLocal(expr, expr->keyword);
+    return null;
+}
