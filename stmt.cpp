@@ -10,7 +10,7 @@ using namespace std;
 template <typename T>
 class Stmt;
 
-template <typename T>
+template <typename T, typename P>
 class StmtVisitor;
 
 
@@ -22,7 +22,7 @@ template <typename T>
 class Class;
 
 
-template <typename T>
+template <typename T, typename P>
 class Expression;
 
 
@@ -30,23 +30,23 @@ template <typename T>
 class Function;
 
 
-template <typename T>
+template <typename T, typename P>
 class If;
 
 
-template <typename T>
+template <typename T, typename P>
 class Print;
 
 
-template <typename T>
+template <typename T, typename P>
 class Return;
 
 
-template <typename T>
+template <typename T, typename P>
 class Var;
 
 
-template <typename T>
+template <typename T, typename P>
 class While;
 
 
@@ -88,11 +88,11 @@ class Class: public Stmt<T> {
 		}
 };
 
-template <typename T>
+template <typename T, typename P>
 class Expression: public Stmt<T> {
 	public:
-		Expr<T>* expression;
-		Expression(Expr<T>* expression) {
+		Expr<P>* expression;
+		Expression(Expr<P>* expression) {
 			this->expression = expression;
 		}
 
@@ -126,13 +126,13 @@ class Function: public Stmt<T> {
 		}
 };
 
-template <typename T>
+template <typename T, typename P>
 class If: public Stmt<T> {
 	public:
-		Expr<T>* condition;
+		Expr<P>* condition;
 		Stmt<T>* thenBranch;
 		Stmt<T>* elseBranch;
-		If(Expr<T>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch) {
+		If(Expr<P>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch) {
 			this->condition = condition;
 			this->thenBranch = thenBranch;
 			this->elseBranch = elseBranch;
@@ -147,11 +147,11 @@ class If: public Stmt<T> {
 		}
 };
 
-template <typename T>
+template <typename T, typename P>
 class Print: public Stmt<T> {
 	public:
-		Expr<T>* expression;
-		Print(Expr<T>* expression) {
+		Expr<P>* expression;
+		Print(Expr<P>* expression) {
 			this->expression = expression;
 		}
 
@@ -164,12 +164,12 @@ class Print: public Stmt<T> {
 		}
 };
 
-template <typename T>
+template <typename T, typename P>
 class Return: public Stmt<T> {
 	public:
 		Token keyword;
-		Expr<T>* value;
-		Return(Token keyword, Expr<T>* value) {
+		Expr<P>* value;
+		Return(Token keyword, Expr<P>* value) {
 			this->keyword = keyword;
 			this->value = value;
 		}
@@ -183,12 +183,12 @@ class Return: public Stmt<T> {
 		}
 };
 
-template <typename T>
+template <typename T, typename P>
 class Var: public Stmt<T> {
 	public:
 		Token name;
-		Expr<T>* initializer;
-		Var(Token name, Expr<T>* initializer) {
+		Expr<P>* initializer;
+		Var(Token name, Expr<P>* initializer) {
 			this->name = name;
 			this->initializer = initializer;
 		}
@@ -202,12 +202,12 @@ class Var: public Stmt<T> {
 		}
 };
 
-template <typename T>
+template <typename T, typename P>
 class While: public Stmt<T> {
 	public:
-		Expr<T>* condition;
+		Expr<P>* condition;
 		Stmt<T>* body;
-		While(Expr<T>* condition, Stmt<T>* body) {
+		While(Expr<P>* condition, Stmt<T>* body) {
 			this->condition = condition;
 			this->body = body;
 		}
@@ -222,18 +222,18 @@ class While: public Stmt<T> {
 };
 
 // visitor interface
-template <typename T>
+template <typename T, typename P>
 class StmtVisitor {
 	public:
 		virtual T visit(Block<T>* stmt) = 0;
 		virtual T visit(Class<T>* stmt) = 0;
-		virtual T visit(Expression<T>* stmt) = 0;
+		virtual T visit(Expression<T, P>* stmt) = 0;
 		virtual T visit(Function<T>* stmt) = 0;
-		virtual T visit(If<T>* stmt) = 0;
-		virtual T visit(Print<T>* stmt) = 0;
-		virtual T visit(Return<T>* stmt) = 0;
-		virtual T visit(Var<T>* stmt) = 0;
-		virtual T visit(While<T>* stmt) = 0;
+		virtual T visit(If<T, P>* stmt) = 0;
+		virtual T visit(Print<T,P>* stmt) = 0;
+		virtual T visit(Return<T,P>* stmt) = 0;
+		virtual T visit(Var<T,P>* stmt) = 0;
+		virtual T visit(While<T,P>* stmt) = 0;
 };
 
 template <typename T>

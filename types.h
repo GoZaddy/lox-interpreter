@@ -3,10 +3,11 @@
 
 #include "stmt.cpp"
 #include "expr.cpp"
+#include <variant>
 
 
 
-typedef string rv; // rv - return value for visitor
+typedef std::variant<std::string, double, bool, void*> rv; // rv - return value for visitor
 
 extern rv null;
 
