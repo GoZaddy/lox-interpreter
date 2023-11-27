@@ -353,6 +353,9 @@ rv Interpreter::visit(Printvp stmt){
     } else if (isInstance(value)){
         std::cout << environment->getInstance(value)->toString() << endl;
         return null;
+    } else if (isStringLiteral(value)){
+        std::cout << value.substr(1,value.size()-2) << endl; //trim quotes
+        return null;
     }
     std::cout << value << endl;
     return null;

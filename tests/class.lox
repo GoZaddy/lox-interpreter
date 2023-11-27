@@ -1,0 +1,18 @@
+// Test passes!
+
+class Foo {
+  init() {
+    print "call init method";
+  }
+  assign(){
+    this.name = "FooTest";
+  }
+}
+
+var foo = Foo();
+foo.assign();
+print foo.name;
+
+// The output should be:
+// "call init method"
+// "FooTest"
