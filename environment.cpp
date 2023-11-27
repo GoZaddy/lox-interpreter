@@ -4,6 +4,16 @@
 #include "declr.h"
 
 
+/**
+ * 
+ * keys
+ * ()func_name => regular function
+ * (instance)pointer_value => LoxInstance
+ * (class)class_name => Class
+ * (.)
+*/
+
+
 
 LoxCallable* Environment::getCallable(string key){
     if (funcMap.find(key) != funcMap.end()){
@@ -17,7 +27,7 @@ LoxCallable* Environment::getCallable(string key){
 }
 
 LoxCallable* Environment::getClassMethod(string key){
-    // format for class method key => (.) className methodName
+    // format for class method key => (.) class_key methodName
     stringstream ss(key);
     string classKey, methodName;
     ss >> classKey >> classKey >> methodName;
@@ -56,12 +66,15 @@ LoxInstance* Environment::getInstance(string key){
     return nullptr;
 }
 
-Environment::Environment(){
+Environment::Environment(std::string environmentKey){
     enclosing = nullptr;
+    this->environmentKey = environmentKey;
 }
 
-Environment::Environment(Environment* enclosing) {
+
+Environment::Environment(Environment* enclosing, std::string environmentKey) {
     this->enclosing = enclosing;
+    this->environmentKey = environmentKey;
 }
 
 void Environment::define(string name, string value){

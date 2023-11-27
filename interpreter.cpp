@@ -44,14 +44,7 @@ bool Interpreter::isCallable(string expr){
 
 
 bool Interpreter::isClassMethod(string expr){
-    if (isCallable(expr)){
-        if (expr.find('.') != std::string::npos){
-            return true;
-        }
-    }
-
-
-    return false;
+    return expr.substr(0,3) == "(.)";
 }
 
 bool Interpreter::isClass(string expr){
@@ -271,7 +264,7 @@ rv Interpreter::visit(Callvp expr) {
             ss >> className >> className >> methodName >> instanceKey;
 
             
-            func = environment->getClassMethod("(.) "+ className+" "+methodName);
+            func = environment->getClassMethod(callee);
             func = ((LoxFunction*) func)->bind(environment->getInstance(instanceKey));
         } else {
             func = environment->getCallable(callee);
@@ -331,6 +324,7 @@ rv Interpreter::visit(Expressionvp stmt){
 }
 
 rv Interpreter::visit(Functionvp stmt){
+    // TODO: create a combination key for functions st
     LoxCallable* func = new LoxFunction(stmt, environment, false);
     environment->defineFunc(stmt->name.lexeme, func); // come up with our solution for this
     return "";

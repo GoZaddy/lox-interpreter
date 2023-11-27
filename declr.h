@@ -90,6 +90,10 @@ class Environment{
         std::unordered_map<string, LoxInstance*> instanceMap;
         Environment* enclosing;
 
+        // environment keys are useful for referencing objects created in nested scopes.
+        // This supports features like closures
+        std::string environmentKey;
+
 
         LoxCallable* getCallable(string key);
 
@@ -108,9 +112,9 @@ class Environment{
 
         friend class LoxClass;
 
-        Environment();
+        Environment(std::string environmentKey="");
          
-        Environment(Environment* enclosing);
+        Environment(Environment* enclosing, std::string environmentKey="");
 
         void define(string name, string value);
 

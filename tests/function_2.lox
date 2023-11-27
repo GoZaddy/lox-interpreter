@@ -1,0 +1,11 @@
+fun greeting(salutation){
+    fun result(name){
+        return salutation + name;
+    }
+
+    return result;
+}
+
+var greet = greeting("Hey! ");
+print greet("Faruq Yusuff");
+
