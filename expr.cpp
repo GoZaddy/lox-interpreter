@@ -161,8 +161,8 @@ class Grouping: public Expr<T> {
 template <typename T>
 class Literal: public Expr<T> {
 	public:
-		string value;
-		Literal(string value) {
+		T value;
+		Literal(T value) {
 			this->value = value;
 		}
 

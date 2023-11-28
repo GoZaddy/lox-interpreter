@@ -24,12 +24,17 @@ class LoxCallable{
     public:
         virtual int arity() = 0;
 		virtual rv call(Interpreter* interpreter, std::vector<rv> arguments) = 0;
+        // virtual Type getType() const;
 };
 
+// Type LoxCallable::getType() const{
+//     return LOX_CALLABLE;
+// }
 
 
 
-class LoxFunction: public LoxCallable{
+
+class LoxFunction: public LoxCallable, public Object{
     private:
         Environment* closure;
     public:
@@ -47,6 +52,8 @@ class LoxFunction: public LoxCallable{
         int arity();
 
         std::string toString();
+
+        Type getType() const;
 };
 
 
@@ -84,10 +91,10 @@ typedef std::string string;
 
 class Environment{
     private:
-        std::unordered_map<string, string> values;
-        std::unordered_map<string, LoxCallable*> funcMap;
-        std::unordered_map<string, LoxClass*> classMap;
-        std::unordered_map<string, LoxInstance*> instanceMap;
+        std::unordered_map<string, rv> values;
+        // std::unordered_map<string, LoxCallable*> funcMap;
+        // std::unordered_map<string, LoxClass*> classMap;
+        // std::unordered_map<string, LoxInstance*> instanceMap;
         Environment* enclosing;
 
         // environment keys are useful for referencing objects created in nested scopes.
@@ -116,19 +123,19 @@ class Environment{
          
         Environment(Environment* enclosing, std::string environmentKey="");
 
-        void define(string name, string value);
+        void define(string name, rv value);
 
         void defineFunc(string name, LoxCallable* func);
 
-        string get(Token name);
+        rv get(Token name);
 
-        void assign(Token name, string value);
+        void assign(Token name, rv value);
 
         void addClass(string name, LoxClass* klass);
 
-        string getAt(int distance, string name);
+        rv getAt(int distance, string name);
 
-        void assignAt(int distance, Token name, string value);
+        void assignAt(int distance, Token name, rv value);
 
         string addInstance(LoxInstance* instance);
         
@@ -153,20 +160,6 @@ class Interpreter : public ExprVisv, public StmtVisv{
 
         rv evaluate(Exprvp expr);
         bool isTruthy(rv object);
-
-        bool isStringLiteral(string literal);
-
-        bool isNumberLiteral(string literal);
-
-        bool isCallable(string expr);
-
-        bool isClassMethod(string expr);
-
-        bool isClass(string expr);
-
-        bool isInstance(string expr);
-
-        bool isEqual(rv a, rv b);
 
         void checkNumberOperand(Token operatorToken, rv operand);
 
@@ -214,23 +207,23 @@ class Interpreter : public ExprVisv, public StmtVisv{
 
         rv visit(Assignvp expr);
 
-        rv visit(Expressionvp stmt);
+        stmt_rv visit(Expressionvp stmt);
 
-        rv visit(Functionvp stmt);
+        stmt_rv visit(Functionvp stmt);
 
-        rv visit(Ifvp stmt);
+        stmt_rv visit(Ifvp stmt);
 
-        rv visit(Printvp stmt);
+        stmt_rv visit(Printvp stmt);
 
-        rv visit(Returnvp stmt);
+        stmt_rv visit(Returnvp stmt);
 
-        rv visit(Varvp stmt);
+        stmt_rv visit(Varvp stmt);
 
-        rv visit(Whilevp stmt);
+        stmt_rv visit(Whilevp stmt);
 
-        rv visit(Blockvp stmt);
+        stmt_rv visit(Blockvp stmt);
 
-        rv visit(Classvp stmt);
+        stmt_rv visit(Classvp stmt);
 
         void resolve(Exprvp expr, int depth);
 
@@ -250,7 +243,7 @@ class Interpreter : public ExprVisv, public StmtVisv{
 
 
 
-class LoxClass: public LoxCallable{
+class LoxClass: public LoxCallable, public Object{
     private:
         std::unordered_map<string, LoxFunction*> methods;
         LoxClass* superclass;
@@ -266,9 +259,11 @@ class LoxClass: public LoxCallable{
 
         rv call(Interpreter* interpreter, std::vector<rv> arguments);
 
-        rv findMethod(string name);
+        LoxFunction* findMethod(string name);
 
         int arity();
+
+        Type getType() const;
 };
 
 
@@ -283,19 +278,21 @@ class LoxClass: public LoxCallable{
 
 
 
-class LoxInstance {
+class LoxInstance: public Object {
     private:
         LoxClass* klass;
-        std::unordered_map<string, string> fields;
+        std::unordered_map<string, rv> fields;
     
     public:
         LoxInstance(LoxClass* klass);
 
-        string get(Token name);
+        rv get(Token name);
 
-        void set(Token name, string value);
+        void set(Token name, rv value);
 
         std::string toString();
+
+        Type getType() const;
 };
 
 
@@ -372,23 +369,23 @@ class Resolver: ExprVisv, StmtVisv {
 
         rv visit(Assignvp expr);
 
-        rv visit(Expressionvp stmt);
+        stmt_rv visit(Expressionvp stmt);
 
-        rv visit(Functionvp stmt);
+        stmt_rv visit(Functionvp stmt);
 
-        rv visit(Ifvp stmt);
+        stmt_rv visit(Ifvp stmt);
 
-        rv visit(Printvp stmt);
+        stmt_rv visit(Printvp stmt);
 
-        rv visit(Returnvp stmt);
+        stmt_rv visit(Returnvp stmt);
 
-        rv visit(Varvp stmt);
+        stmt_rv visit(Varvp stmt);
 
-        rv visit(Whilevp stmt);
+        stmt_rv visit(Whilevp stmt);
 
-        rv visit(Blockvp stmt);
+        stmt_rv visit(Blockvp stmt);
 
-        rv visit(Classvp stmt); 
+        stmt_rv visit(Classvp stmt); 
 
         rv visit(Getvp expr);
 

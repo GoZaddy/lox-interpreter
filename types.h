@@ -4,18 +4,20 @@
 #include "stmt.cpp"
 #include "expr.cpp"
 #include <variant>
+#include "helper/object.cpp"
 
 
 
-typedef std::variant<std::string, double, bool, void*> rv; // rv - return value for visitor
+typedef Object* rv; // rv - return value for visitor
+typedef void stmt_rv;
 
-extern rv null;
+// extern rv null;
 
 
 
 
 typedef ExprVisitor<rv> ExprVisv;
-typedef StmtVisitor<rv> StmtVisv;
+typedef StmtVisitor<stmt_rv, rv> StmtVisv;
 typedef Literal<rv> Litv;
 typedef Literal<rv>* Litvp;
 typedef Logical<rv> Logicalv;
@@ -42,25 +44,27 @@ typedef Variable<rv> Variablev;
 typedef Variablev* Variablevp;
 typedef Assign<rv> Assignv;
 typedef Assign<rv>* Assignvp;
-typedef Stmt<rv> Stmtv;
+
+
+typedef Stmt<stmt_rv> Stmtv;
 typedef Stmtv* Stmtvp;
-typedef Expression<rv> Expressionv;
+typedef Expression<stmt_rv, rv> Expressionv;
 typedef Expressionv* Expressionvp;
-typedef Print<rv> Printv;
+typedef Print<stmt_rv, rv> Printv;
 typedef Printv* Printvp;
-typedef Var<rv> Varv;
+typedef Var<stmt_rv, rv> Varv;
 typedef Varv* Varvp;
-typedef Block<rv> Blockv;
+typedef Block<stmt_rv> Blockv;
 typedef Blockv* Blockvp;
-typedef If<rv> Ifv;
+typedef If<stmt_rv, rv> Ifv;
 typedef Ifv* Ifvp;
-typedef While<rv> Whilev;
+typedef While<stmt_rv, rv> Whilev;
 typedef Whilev* Whilevp;
-typedef Function<rv> Functionv;
+typedef Function<stmt_rv> Functionv;
 typedef Functionv* Functionvp;
-typedef Return<rv> Returnv;
+typedef Return<stmt_rv, rv> Returnv;
 typedef Returnv* Returnvp;
-typedef Class<rv> Classv;
+typedef Class<stmt_rv> Classv;
 typedef Classv* Classvp;
 
 

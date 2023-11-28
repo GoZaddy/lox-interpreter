@@ -5,6 +5,11 @@
 #include <sstream>
 
 
+#define GET_DOUBLE(x) Util::GetDouble(x)
+
+#define GET_STRING(x) Util::GetString(x)
+
+
 // Looking back, I probably could have created helper classes similar to Stmt and Expr or even somehow
 // used both those classes to represent the return type of these evaluate() expressions
 // i.e create a pure virtual class that expr and stmt derive from and use a pointer
@@ -16,75 +21,69 @@ rv Interpreter::evaluate(Exprvp expr){
     // delete expr; // TODO: test this out
     return value;
 }
-bool Interpreter::isTruthy(rv object){
-    if (object == "nil") return false; // TODO: what other values could return false
-    if (object == "true") return true;
-    if (object == "false") return false;
-    return true;
-}
 
-bool Interpreter::isStringLiteral(string literal){
-    return literal[0] == '\"' && literal[literal.size()-1] == '\"';
-}
+// bool Interpreter::Util::isStringLiteral(string literal){
+//     return literal[0] == '\"' && literal[literal.size()-1] == '\"';
+// }
 
-bool Interpreter::isNumberLiteral(string literal){
-    char* end = nullptr;
-    double val = strtod(literal.c_str(), &end);
-    return end != literal.c_str() && *end == '\0';
-}
+// bool Interpreter::Util::isNumberLiteral(string literal){
+//     char* end = nullptr;
+//     double val = strtod(literal.c_str(), &end);
+//     return end != literal.c_str() && *end == '\0';
+// }
 
-bool Interpreter::isCallable(string expr){
-    if (expr.size() > 2){
-        if (expr.substr(0,2) == "()" || (expr.substr(0,3) == "(.)")){
-            return true;
-        }
-    }
-    return false;
-}
+// bool Interpreter::Util::isCallable(string expr){
+//     if (expr.size() > 2){
+//         if (expr.substr(0,2) == "()" || (expr.substr(0,3) == "(.)")){
+//             return true;
+//         }
+//     }
+//     return false;
+// }
 
 
-bool Interpreter::isClassMethod(string expr){
-    return expr.substr(0,3) == "(.)";
-}
+// bool Interpreter::isClassMethod(string expr){
+//     return expr.substr(0,3) == "(.)";
+// }
 
-bool Interpreter::isClass(string expr){
-    if (expr.size() > 7){
-        if (expr.substr(0,7) == "(class)"){
-            return true;
-        }
-    }
-    return false;
-}
+// bool Interpreter::Util::isClass(string expr){
+//     if (expr.size() > 7){
+//         if (expr.substr(0,7) == "(class)"){
+//             return true;
+//         }
+//     }
+//     return false;
+// }
 
-bool Interpreter::isInstance(string expr){
-    if (expr.size() > 10){
-        if (expr.substr(0,10) == "(instance)"){
-            return true;
-        }
-    }
-    return false;
-}
+// bool Interpreter::Util::isInstance(string expr){
+//     if (expr.size() > 10){
+//         if (expr.substr(0,10) == "(instance)"){
+//             return true;
+//         }
+//     }
+//     return false;
+// }
 
-bool Interpreter::isEqual(rv a, rv b){
-    return a == b;
-}
+// bool Interpreter::isEqual(rv a, rv b){
+//     return a == b;
+// }
 
 void Interpreter::checkNumberOperand(Token operatorToken, rv operand){
-    if (isNumberLiteral(operand)) return;
+    if (Util::isNumberLiteral(operand)) return;
     throw Util::runtimeError(operatorToken, "Operand must be a number.");
 }
 
 void Interpreter::checkNumberOperands(Token operatorToken, rv left, rv right){
-    if (isNumberLiteral(left) && isNumberLiteral(right)) return;
+    if (Util::isNumberLiteral(left) && Util::isNumberLiteral(right)) return;
     throw Util::runtimeError(operatorToken, "Operands must be numbers");
 }
 
-string Interpreter::stripTrailingZeroes(rv text){
-    if (text.size() > 7 && text.substr(text.size()-7) == ".000000"){
-        text = text.substr(0, text.size()-7);
-    }
-    return text;
-}
+// string Interpreter::stripTrailingZeroes(rv text){
+//     if (text.size() > 7 && text.substr(text.size()-7) == ".000000"){
+//         text = text.substr(0, text.size()-7);
+//     }
+//     return text;
+// }
 
 void Interpreter::execute(Stmtvp stmt){
     stmt->accept(this);
@@ -142,9 +141,9 @@ rv Interpreter::visit(Logicalvp expr) {
     rv left = evaluate(expr->left);
 
     if (expr->operatorToken.type == OR) {
-        if (isTruthy(left)) return left;
+        if (Util::isTruthy(left)) return left;
     } else {
-        if (!isTruthy(left)) return left;
+        if (!Util::isTruthy(left)) return left;
     }
 
     return evaluate(expr->right);
@@ -155,7 +154,7 @@ rv Interpreter::visit(Setvp expr) {
     rv object = evaluate(expr->object);
 
 
-    if (!isInstance(object)) { 
+    if (!Util::isInstance(object)) { 
         throw Util::runtimeError(
             expr->name,
             "Only instances have fields."
@@ -177,12 +176,12 @@ rv Interpreter::visit(Unav* expr){
     switch(expr->operatorToken.type){
         case MINUS:
             checkNumberOperand(expr->operatorToken, right);
-            return "-"+right;
+            return new Double(-1 * ((Double*) right)->getValue());
         case BANG:
-            return isTruthy(right) ? "false" : "true";
+            return Util::isTruthy(right) ? False : True;
         default:
             //unreachable
-            return ""; // empty string is null for us
+            return nullptr; // empty string is null for us
     }
 }
 
@@ -193,47 +192,46 @@ rv Interpreter::visit(Binv* expr){
     switch(expr->operatorToken.type){
         case MINUS:
             checkNumberOperands(expr->operatorToken, left, right);
-            return stripTrailingZeroes(std::to_string(Util::doub(left) - Util::doub(right)));
+            return new Double(GET_DOUBLE(left) - GET_DOUBLE(right));
         case SLASH:
             checkNumberOperands(expr->operatorToken, left, right);
-            return stripTrailingZeroes(std::to_string(Util::doub(left) / Util::doub(right)));
+            return new Double(GET_DOUBLE(left) / GET_DOUBLE(right));
         case STAR:
             checkNumberOperands(expr->operatorToken, left, right);
-            return stripTrailingZeroes(std::to_string(Util::doub(left) * Util::doub(right)));
+            return new Double(GET_DOUBLE(left) * GET_DOUBLE(right));
         case PLUS:
-            if (isStringLiteral(left) && isStringLiteral(right)){
-                left.pop_back();
-                return left + right.substr(1);
+            if (Util::isStringLiteral(left) && Util::isStringLiteral(right)){
+                return new String(GET_STRING(left) + GET_STRING(right));
             }
             
-            if (isNumberLiteral(left) && isNumberLiteral(right)){
-                return stripTrailingZeroes(std::to_string(Util::doub(left) + Util::doub(right)));
+            if (Util::isNumberLiteral(left) && Util::isNumberLiteral(right)){
+                return new Double(GET_DOUBLE(left) + GET_DOUBLE(right));
             }
 
             throw Util::runtimeError(expr->operatorToken, "Operands must be two numbers or two strings.");
             
         case GREATER:
             checkNumberOperands(expr->operatorToken, left, right);
-            return (Util::doub(left) > Util::doub(right)) ? "true" : "false";
+            return (GET_DOUBLE(left) > GET_DOUBLE(right)) ? True : False;
         case GREATER_EQUAL:
             checkNumberOperands(expr->operatorToken, left, right);
-            return (Util::doub(left) >= Util::doub(right)) ? "true" : "false";
+            return (GET_DOUBLE(left) >= GET_DOUBLE(right)) ? True : False;
         case LESS:
             checkNumberOperands(expr->operatorToken, left, right);
-            return (Util::doub(left) < Util::doub(right)) ? "true" : "false";
+            return (GET_DOUBLE(left) < GET_DOUBLE(right)) ? True : False;
         case LESS_EQUAL:
             checkNumberOperands(expr->operatorToken, left, right);
-            return (Util::doub(left) <= Util::doub(right)) ? "true" : "false";
+            return (GET_DOUBLE(left) <= GET_DOUBLE(right)) ? True : False;
             
         case BANG_EQUAL:
-            return isEqual(left, right) ? "false" : "true";
+            return Util::isEqual(left, right) ? False : True;
         case EQUAL_EQUAL:
-            return isEqual(left, right) ? "true" : "false";
+            return Util::isEqual(left, right) ? True : False;
             
 
         default:
             //unreachable
-            return "";
+            return nullptr;
     }
 }
 
@@ -241,7 +239,7 @@ rv Interpreter::visit(Callvp expr) {
     rv callee = evaluate(expr->callee);
    
 
-    if (!isCallable(callee) && !isClass(callee)){
+    if (!Util::isCallable(callee) && !Util::isClass(callee)){
         throw Util::runtimeError(expr->paren, "Can only call functions and classes.");
     }
 
@@ -255,7 +253,7 @@ rv Interpreter::visit(Callvp expr) {
     LoxCallable* func;
 
 
-    if (isCallable(callee)){
+    if (Util::isCallable(callee)){
         if (isClassMethod(callee)){
             // todo: figure out a way to get instance key here
             // we can just call bind here 
@@ -277,15 +275,15 @@ rv Interpreter::visit(Callvp expr) {
 
     if (arguments.size() != func->arity()) {
         throw Util::runtimeError(expr->paren, "Expected " +
-            std::to_string(func->arity()) + " arguments but got " +
-            std::to_string(arguments.size()) + ".");
+            (func->arity()) + " arguments but got " +
+            (arguments.size()) + ".");
     }
     return func->call(this, arguments);
 }
 
 rv Interpreter::visit(Getvp expr) {
     rv object = evaluate(expr->object);
-    if (isInstance(object)) {
+    if (Util::isInstance(object)) {
         return environment->getInstance(object)->get(expr->name);
     }
 
@@ -327,27 +325,27 @@ rv Interpreter::visit(Functionvp stmt){
     // TODO: create a combination key for functions st
     LoxCallable* func = new LoxFunction(stmt, environment, false);
     environment->defineFunc(stmt->name.lexeme, func); // come up with our solution for this
-    return "";
+    return nullptr;
 }
 
 rv Interpreter::visit(Ifvp stmt) {
-    if (isTruthy(evaluate(stmt->condition))) {
+    if (Util::isTruthy(evaluate(stmt->condition))) {
         execute(stmt->thenBranch);
     } else if (stmt->elseBranch != nullptr) {
         execute(stmt->elseBranch);
     }
-    return "";
+    return nullptr;
 }
 
 rv Interpreter::visit(Printvp stmt){
     rv value = evaluate(stmt->expression);
-    if (isClass(value)){
+    if (Util::isClass(value)){
         std::cout << environment->getClass(value)->toString() << endl;
         return null;
-    } else if (isInstance(value)){
+    } else if (Util::isInstance(value)){
         std::cout << environment->getInstance(value)->toString() << endl;
         return null;
-    } else if (isStringLiteral(value)){
+    } else if (Util::isStringLiteral(value)){
         std::cout << value.substr(1,value.size()-2) << endl; //trim quotes
         return null;
     }
@@ -373,23 +371,23 @@ rv Interpreter::visit(Varvp stmt){
 }
 
 rv Interpreter::visit(Whilevp stmt) {
-    while (isTruthy(evaluate(stmt->condition))) {
+    while (Util::isTruthy(evaluate(stmt->condition))) {
         execute(stmt->body);
     }
-    return "";
+    return nullptr;
 }
 
 rv Interpreter::visit(Blockvp stmt) {
     Environment* newEnv = new Environment(environment); 
     executeBlock(stmt->statements, newEnv);
-    return "";
+    return nullptr;
 }
 
 rv Interpreter::visit(Classvp stmt) {
     rv superclass = null;
     if (stmt->superclass != nullptr) {
         superclass = evaluate(stmt->superclass);
-        if (!isClass(superclass)) {
+        if (!Util::isClass(superclass)) {
             throw Util::runtimeError(
                 stmt->superclass->name,
                 "Superclass must be a class."

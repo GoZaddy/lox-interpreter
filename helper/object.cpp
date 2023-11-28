@@ -1,147 +1,85 @@
-#include <iostream>
-#include <string>
+#include "object.h"
 
-using namespace std;
+String::String(const std::string val) : value(val) {}
 
-#define OUTPUT_STREAM_BODY() \
-    do {    \
-        os << input.value;    \
-        return os;  \
-    } while(false) 
+Type String::getType() const {
+    return STRING;
+}
 
-enum Type{
-    STRING,
-    DOUBLE,
-    BOOLEAN,
-    LOX_FUNCTION
-};
+std::string String::getValue() const {
+    return value;
+}
 
-class Object {
-public:
-    virtual Type getType() const = 0;
-};
+String String::operator+(const String& other) const {
+    return String(this->value + other.getValue());
+}
 
-class String : public Object {
-private:
-    std::string value;
+String String::operator+(std::string& other) const {
+    return String(this->value + other);
+}
 
-public:
-    String(const std::string val) : value(val) {}
-
-    Type getType() const override {
-        return STRING;
-    }
-
-    std::string getValue() const {
-        return value;
-    }
-
-    String operator +(const String& other) const{
-        return String(this->value+other.getValue());
-    }
-
-    String operator +(std::string& other) const{
-        return String(this->value+other);
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const String& str);
-};
+bool String::operator==(const String& other) const {
+    return this->value == other.getValue();
+}
 
 std::ostream& operator<<(std::ostream& os, const String& input) {
     OUTPUT_STREAM_BODY();
 }
 
+Double::Double(double val) : value(val) {}
 
+Type Double::getType() const {
+    return DOUBLE;
+}
 
+double Double::getValue() const {
+    return value;
+}
 
+Double Double::operator*(const Double& other) const {
+    return Double(value * other.getValue());
+}
 
+Double Double::operator+(const Double& other) const {
+    return Double(value + other.getValue());
+}
 
+Double Double::operator-(const Double& other) const {
+    return Double(value - other.getValue());
+}
 
+Double Double::operator/(const Double& other) const {
+    return Double(value / other.getValue());
+}
 
-class Double : public Object {
-private:
-    double value;
-
-public:
-    Double(double val) : value(val) {}
-
-    Type getType() const override {
-        return DOUBLE;
-    }
-
-    double getValue() const {
-        return value;
-    }
-
-    Double operator*(const Double& other) const {
-        return Double(value * other.getValue());
-    }
-
-    Double operator+(const Double& other) const {
-        return Double(value + other.getValue());
-    }
-
-    Double operator-(const Double& other) const {
-        return Double(value - other.getValue());
-    }
-
-    Double operator/(const Double& other) const {
-        return Double(value / other.getValue());
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const Double& str);
-
-};
+bool Double::operator==(const Double& other) const {
+    return this->value == other.getValue();
+}
 
 std::ostream& operator<<(std::ostream& os, const Double& input) {
     OUTPUT_STREAM_BODY();
 }
 
-class Boolean : public Object {
-private:
-    bool value;
+Boolean::Boolean(bool val) : value(val) {}
 
-public:
-    Boolean(bool val) : value(val) {}
+Type Boolean::getType() const {
+    return BOOLEAN;
+}
 
-    Type getType() const override {
-        return BOOLEAN;
-    }
+bool Boolean::getValue() const {
+    return value;
+}
 
-    bool getValue() const {
-        return value;
-    }
+Boolean Boolean::operator!() const {
+    return Boolean(!value);
+}
 
-    Boolean operator!() const{
-        return Boolean(!value);
-    }
-
-    std::ostream& operator<<(std::ostream& os) const{
-        os << value;
-        return os;
-    }
-
-    friend std::ostream& operator<<(std::ostream& os, const Boolean& str);
-};
-
-std::ostream& operator<<(std::ostream& os, const Boolean& input) {
-    OUTPUT_STREAM_BODY();
+bool Boolean::operator==(const Boolean& other) const {
+    return this->value == other.getValue();
 }
 
 
-
-
-int main(){
-    Object* str;
-
-    String hi("heyy");
-
-    str = &hi;
-
-    std::cout << "str: " << hi << endl;
-    std::cout << (hi + String("faruq")) << endl;
-
-    std::cout << (str->getType() == STRING ? "true" : "false") << endl;
-
-    return 0;
+std::ostream& operator<<(std::ostream& os, const Boolean& input) {
+    os << input.getValue();
+    return os;
 }

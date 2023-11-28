@@ -46,3 +46,7 @@ int LoxFunction::arity(){
 std::string LoxFunction::toString() {
     return "<fn " + declaration->name.lexeme + ">";
 }
+
+Type LoxFunction::getType() const {
+    return LOX_FUNCTION;
+}

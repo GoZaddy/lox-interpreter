@@ -18,30 +18,34 @@ rv LoxClass::call(Interpreter* interpreter, std::vector<rv> arguments){
     LoxInstance* instance = new LoxInstance(this);
 
     rv initializer = findMethod("init");
-    if (initializer != null) {
+    if (initializer != nullptr) {
         (methods["init"])->bind(instance)->call(interpreter, arguments);
     }
     
-    return interpreter->environment->addInstance(instance);
+    return instance;
 }
 
-rv LoxClass::findMethod(string name) {
+LoxFunction* LoxClass::findMethod(string name) {
     // class method key => (.) class_key method_name
     // class_key => (class)class_name
     if (methods.find(name) != methods.end()) {
-        return "(.) (class)"+this->name+" "+name;
+        return methods[name];
     }
 
     if (superclass != nullptr) {
       return superclass->findMethod(name);
     }
 
-    return null;
+    return nullptr;
 }
 
 
 int LoxClass::arity(){
     rv initializer = findMethod("init");
-    if (initializer == null) return 0;
+    if (initializer == nullptr) return 0;
     return methods["init"]->arity();
+}
+
+Type LoxClass::getType() const {
+    return LOX_CLASS;
 }

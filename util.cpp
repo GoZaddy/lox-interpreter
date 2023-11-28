@@ -29,3 +29,53 @@ std::string Util::runtimeError(Token token, std::string message){
 double Util::doub(std::string input){
     return std::stod(input);
 }
+
+bool Util::isNumberLiteral(rv expr){
+    return expr->getType() == NUMBER;
+}
+
+bool Util::isCallable(rv expr){
+    Type type = expr->getType();
+    return type == LOX_FUNCTION || type == LOX_CLASS;
+}
+
+// bool Util::isClassMethod(rv expr);
+
+bool Util::isClass(rv expr){
+    return expr->getType() == LOX_CLASS;
+}
+
+bool Util::isInstance(rv expr){
+    return expr->getType() == LOX_INSTANCE;
+}
+
+bool Util::isEqual(rv a, rv b){
+    Type typeA = a->getType();
+    Type typeB = b->getType();
+
+    if (typeA != typeB){
+        return false;
+    }
+
+    if (typeA == STRING){
+        return ((String*) a) == ((String*) b);
+    }
+
+    if (typeA == DOUBLE){
+        return ((Double*) a) == ((Double*) b);
+    }
+
+    if (typeA == BOOLEAN){
+        return ((Boolean*) a) == ((Boolean*) b);
+    }
+
+    return a == b;
+}
+
+bool Util::isTruthy(rv object){
+    if (object == nullptr) return false; // TODO: what other values could return false
+    if (object->getType() == BOOLEAN){
+        return ((Boolean*) object)->getValue();
+    }
+    return true;
+}
