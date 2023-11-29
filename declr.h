@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef DECLR
+#define DECLR
 
 #include <iostream>
 #include "util.h"
@@ -20,21 +20,21 @@ class Environment;
 
 
 
-class LoxCallable{
+class LoxCallable: public Object{
     public:
         virtual int arity() = 0;
 		virtual rv call(Interpreter* interpreter, std::vector<rv> arguments) = 0;
-        // virtual Type getType() const;
+        virtual Type getType() const;
 };
 
-// Type LoxCallable::getType() const{
-//     return LOX_CALLABLE;
-// }
+Type LoxCallable::getType() const{
+    return LOX_CALLABLE;
+}
 
 
 
 
-class LoxFunction: public LoxCallable, public Object{
+class LoxFunction: public LoxCallable{
     private:
         Environment* closure;
     public:
@@ -102,13 +102,13 @@ class Environment{
         std::string environmentKey;
 
 
-        LoxCallable* getCallable(string key);
+        // LoxCallable* getCallable(string key);
 
-        LoxClass* getClass(string key);
+        // LoxClass* getClass(string key);
 
-        LoxCallable* getClassMethod(string key);
+        // LoxCallable* getClassMethod(string key);
 
-        LoxInstance* getInstance(string key);
+        // LoxInstance* getInstance(string key);
 
         Environment* ancestor(int distance); 
 
@@ -125,13 +125,13 @@ class Environment{
 
         void define(string name, rv value);
 
-        void defineFunc(string name, LoxCallable* func);
+        // void defineFunc(string name, LoxCallable* func);
 
         rv get(Token name);
 
         void assign(Token name, rv value);
 
-        void addClass(string name, LoxClass* klass);
+        // void addClass(string name, LoxClass* klass);
 
         rv getAt(int distance, string name);
 
@@ -243,7 +243,7 @@ class Interpreter : public ExprVisv, public StmtVisv{
 
 
 
-class LoxClass: public LoxCallable, public Object{
+class LoxClass: public LoxCallable{
     private:
         std::unordered_map<string, LoxFunction*> methods;
         LoxClass* superclass;
@@ -397,3 +397,5 @@ class Resolver: ExprVisv, StmtVisv {
 
 
 };
+
+#endif

@@ -12,8 +12,7 @@ LoxFunction::LoxFunction(Functionvp declaration, Environment* closure, bool isIn
 
 LoxFunction* LoxFunction::bind(LoxInstance* instance) {
     Environment* environment = new Environment(closure);
-    string instance_key = environment->addInstance(instance);
-    environment->define("this", instance_key);
+    environment->define("this", instance);
     return new LoxFunction(declaration, environment, isInitializer);
 }
 
@@ -36,7 +35,7 @@ rv LoxFunction::call(Interpreter* interpreter, std::vector<rv> arguments){
     }
     
     if (isInitializer) return closure->getAt(0, "this");
-    return "nil";
+    return nullptr;
 }
 
 int LoxFunction::arity(){

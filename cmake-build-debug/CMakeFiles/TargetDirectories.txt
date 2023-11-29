@@ -1,0 +1,3 @@
+/Users/faruqyusuff/Desktop/cs 403/lox-interpreter/cmake-build-debug/CMakeFiles/lox_interpreter.dir
+/Users/faruqyusuff/Desktop/cs 403/lox-interpreter/cmake-build-debug/CMakeFiles/edit_cache.dir
+/Users/faruqyusuff/Desktop/cs 403/lox-interpreter/cmake-build-debug/CMakeFiles/rebuild_cache.dir

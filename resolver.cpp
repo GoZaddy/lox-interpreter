@@ -3,8 +3,6 @@
 #include "declr.h"
 
 
-rv null = "";
-
 Resolver::Resolver(Interpreter* interpreter) {
     this->interpreter = interpreter;
     this->currentFunction = NONE_FUNCTION;
@@ -35,14 +33,13 @@ void Resolver::endScope(){
     scopes->pop();
 }
 
-rv Resolver::visit(Blockvp stmt) {
+stmt_rv Resolver::visit(Blockvp stmt) {
     beginScope();
     resolve(stmt->statements);
     endScope();
-    return null;
 }
 
-rv Resolver::visit(Classvp stmt) {
+stmt_rv Resolver::visit(Classvp stmt) {
     ClassType enclosingClass = currentClass;
     currentClass = CLASS_;
 
@@ -85,16 +82,14 @@ rv Resolver::visit(Classvp stmt) {
 
     endScope();
     currentClass = enclosingClass;
-    return null;
 }
 
-rv Resolver::visit(Varvp stmt) {
+stmt_rv Resolver::visit(Varvp stmt) {
     declare(stmt->name);
     if (stmt->initializer != nullptr) {
         resolve(stmt->initializer);
     }
     define(stmt->name);
-    return null;
 }
 
 void Resolver::declare(Token name) {
@@ -115,7 +110,7 @@ void Resolver::define(Token name) {
 }
 
 rv Resolver::visit(Variablevp expr) {
-    if (scopes->empty()) return null;
+    if (scopes->empty()) return nullptr;
     if (
         scopes->peek()->find(expr->name.lexeme) != scopes->peek()->end() &&
         scopes->peek()->at(expr->name.lexeme) == false
@@ -125,7 +120,7 @@ rv Resolver::visit(Variablevp expr) {
     }
 
     resolveLocal(expr, expr->name);
-    return null;
+    return nullptr;
 }
 
 void Resolver::resolveLocal(Exprvp expr, Token name) {
@@ -142,15 +137,14 @@ void Resolver::resolveLocal(Exprvp expr, Token name) {
 rv Resolver::visit(Assignvp expr) {
     resolve(expr->value);
     resolveLocal(expr, expr->name);
-    return null;
+    return nullptr;
 }
 
-rv Resolver::visit(Functionvp stmt){
+stmt_rv Resolver::visit(Functionvp stmt){
     declare(stmt->name);
     define(stmt->name);
 
     resolveFunction(stmt, FUNCTION);
-    return null;
 }
 
 
@@ -170,24 +164,21 @@ void Resolver::resolveFunction(Functionvp func, FunctionType type) {
     currentFunction = enclosingFunction;
 }
 
-rv Resolver::visit(Expressionvp stmt) {
+stmt_rv Resolver::visit(Expressionvp stmt) {
     resolve(stmt->expression);
-    return null;
 }
 
-rv Resolver::visit(Ifvp stmt) {
+stmt_rv Resolver::visit(Ifvp stmt) {
     resolve(stmt->condition);
     resolve(stmt->thenBranch);
     if (stmt->elseBranch != nullptr) resolve(stmt->elseBranch);
-    return null;
 }
 
-rv Resolver::visit(Printvp stmt) {
+stmt_rv Resolver::visit(Printvp stmt) {
     resolve(stmt->expression);
-    return null;
 }
 
-rv Resolver::visit(Returnvp stmt) {
+stmt_rv Resolver::visit(Returnvp stmt) {
     if (currentFunction == NONE_FUNCTION) {
       Util::error(stmt->keyword, "Can't return from top-level code.");
     }
@@ -202,19 +193,17 @@ rv Resolver::visit(Returnvp stmt) {
         resolve(stmt->value);
     }
 
-    return null;
 }
 
-rv Resolver::visit(Whilevp stmt) {
+stmt_rv Resolver::visit(Whilevp stmt) {
     resolve(stmt->condition);
     resolve(stmt->body);
-    return null;
 }
 
 rv Resolver::visit(Binvp expr) {
     resolve(expr->left);
     resolve(expr->right);
-    return null;
+    return nullptr;
 }
 
 
@@ -225,38 +214,38 @@ rv Resolver:: visit(Callvp expr) {
       resolve(argument);
     }
 
-    return null;
+    return nullptr;
 }
 
 rv Resolver:: visit(Groupvp expr) {
     resolve(expr->expression);
-    return null;
+    return nullptr;
 }
 
 rv Resolver:: visit(Litvp expr) {
-    return null;
+    return nullptr;
 }
 
 rv Resolver:: visit(Logicalvp expr) {
     resolve(expr->left);
     resolve(expr->right);
-    return null;
+    return nullptr;
 }
 
 rv Resolver:: visit(Unavp expr) {
     resolve(expr->right);
-    return null;
+    return nullptr;
 }
 
 rv Resolver::visit(Getvp expr) {
     resolve(expr->object);
-    return null;
+    return nullptr;
 }
 
 rv Resolver::visit(Setvp expr) {
     resolve(expr->value);
     resolve(expr->object);
-    return null;
+    return nullptr;
 }
 
 rv Resolver::visit(Supervp expr) {\
@@ -268,7 +257,7 @@ rv Resolver::visit(Supervp expr) {\
           "Can't use 'super' in a class with no superclass.");
     }
     resolveLocal(expr, expr->keyword);
-    return null;
+    return nullptr;
 }
 
 
@@ -276,8 +265,8 @@ rv Resolver::visit(Thisvp expr) {
     if (currentClass == NONE_CLASS) {
       Util::error(expr->keyword,
           "Can't use 'this' outside of a class.");
-      return null;
+      return nullptr;
     }
     resolveLocal(expr, expr->keyword);
-    return null;
+    return nullptr;
 }

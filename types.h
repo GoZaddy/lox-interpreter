@@ -46,7 +46,7 @@ typedef Assign<rv> Assignv;
 typedef Assign<rv>* Assignvp;
 
 
-typedef Stmt<stmt_rv> Stmtv;
+typedef Stmt<stmt_rv, rv> Stmtv;
 typedef Stmtv* Stmtvp;
 typedef Expression<stmt_rv, rv> Expressionv;
 typedef Expressionv* Expressionvp;
@@ -54,17 +54,17 @@ typedef Print<stmt_rv, rv> Printv;
 typedef Printv* Printvp;
 typedef Var<stmt_rv, rv> Varv;
 typedef Varv* Varvp;
-typedef Block<stmt_rv> Blockv;
+typedef Block<stmt_rv, rv> Blockv;
 typedef Blockv* Blockvp;
 typedef If<stmt_rv, rv> Ifv;
 typedef Ifv* Ifvp;
 typedef While<stmt_rv, rv> Whilev;
 typedef Whilev* Whilevp;
-typedef Function<stmt_rv> Functionv;
+typedef Function<stmt_rv, rv> Functionv;
 typedef Functionv* Functionvp;
 typedef Return<stmt_rv, rv> Returnv;
 typedef Returnv* Returnvp;
-typedef Class<stmt_rv> Classv;
+typedef Class<stmt_rv, rv> Classv;
 typedef Classv* Classvp;
 
 

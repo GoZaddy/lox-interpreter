@@ -31,12 +31,24 @@ double Util::doub(std::string input){
 }
 
 bool Util::isNumberLiteral(rv expr){
-    return expr->getType() == NUMBER;
+    return expr->getType() == DOUBLE_T;
+}
+
+bool Util::isStringLiteral(rv expr){
+    return expr->getType() == STRING_T;
+}
+
+std::string Util::GetString(rv expr){
+    return ((String*) expr)->getValue();
+}
+
+double Util::GetDouble(rv expr){
+    return ((Double*) expr)->getValue();
 }
 
 bool Util::isCallable(rv expr){
     Type type = expr->getType();
-    return type == LOX_FUNCTION || type == LOX_CLASS;
+    return type == LOX_FUNCTION || type == LOX_CLASS || type == LOX_CALLABLE;
 }
 
 // bool Util::isClassMethod(rv expr);
@@ -57,11 +69,11 @@ bool Util::isEqual(rv a, rv b){
         return false;
     }
 
-    if (typeA == STRING){
+    if (typeA == STRING_T){
         return ((String*) a) == ((String*) b);
     }
 
-    if (typeA == DOUBLE){
+    if (typeA == DOUBLE_T){
         return ((Double*) a) == ((Double*) b);
     }
 

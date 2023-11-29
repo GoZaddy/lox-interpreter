@@ -14,7 +14,7 @@ rv Clock::call(
     milliseconds ms = std::chrono::duration_cast< milliseconds >(
         std::chrono::system_clock::now().time_since_epoch()
     );
-    return std::to_string(ms.count());
+    return new String(std::to_string(ms.count()));
 }
 
 std::string Clock::toString() { return "<native fn>"; }

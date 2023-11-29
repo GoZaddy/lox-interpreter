@@ -40,7 +40,7 @@ class Util{
 
         static bool isEqual(rv a, rv b);
         
-        static bool Util::isTruthy(rv object);
+        static bool isTruthy(rv object);
 
         static std::string GetString(rv expr);
 

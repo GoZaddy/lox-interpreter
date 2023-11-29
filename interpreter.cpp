@@ -2,8 +2,6 @@
 // #include "lox_class.cpp"
 
 #include "declr.h"
-#include <sstream>
-
 
 #define GET_DOUBLE(x) Util::GetDouble(x)
 
@@ -22,51 +20,6 @@ rv Interpreter::evaluate(Exprvp expr){
     return value;
 }
 
-// bool Interpreter::Util::isStringLiteral(string literal){
-//     return literal[0] == '\"' && literal[literal.size()-1] == '\"';
-// }
-
-// bool Interpreter::Util::isNumberLiteral(string literal){
-//     char* end = nullptr;
-//     double val = strtod(literal.c_str(), &end);
-//     return end != literal.c_str() && *end == '\0';
-// }
-
-// bool Interpreter::Util::isCallable(string expr){
-//     if (expr.size() > 2){
-//         if (expr.substr(0,2) == "()" || (expr.substr(0,3) == "(.)")){
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
-
-// bool Interpreter::isClassMethod(string expr){
-//     return expr.substr(0,3) == "(.)";
-// }
-
-// bool Interpreter::Util::isClass(string expr){
-//     if (expr.size() > 7){
-//         if (expr.substr(0,7) == "(class)"){
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
-// bool Interpreter::Util::isInstance(string expr){
-//     if (expr.size() > 10){
-//         if (expr.substr(0,10) == "(instance)"){
-//             return true;
-//         }
-//     }
-//     return false;
-// }
-
-// bool Interpreter::isEqual(rv a, rv b){
-//     return a == b;
-// }
 
 void Interpreter::checkNumberOperand(Token operatorToken, rv operand){
     if (Util::isNumberLiteral(operand)) return;
@@ -78,12 +31,6 @@ void Interpreter::checkNumberOperands(Token operatorToken, rv left, rv right){
     throw Util::runtimeError(operatorToken, "Operands must be numbers");
 }
 
-// string Interpreter::stripTrailingZeroes(rv text){
-//     if (text.size() > 7 && text.substr(text.size()-7) == ".000000"){
-//         text = text.substr(0, text.size()-7);
-//     }
-//     return text;
-// }
 
 void Interpreter::execute(Stmtvp stmt){
     stmt->accept(this);
@@ -97,7 +44,7 @@ Interpreter::Interpreter() {
     globals = new Environment();
     environment = globals;
     LoxCallable* clockFunc = new Clock();
-    globals->defineFunc("clock", clockFunc); // TODO: figure this out, consider using a new map in Environment for just functions
+    globals->define("clock", clockFunc); // TODO: figure this out, consider using a new map in Environment for just functions
 }
 void Interpreter::interpret(std::vector<Stmtvp> statements){
     try{
@@ -243,6 +190,9 @@ rv Interpreter::visit(Callvp expr) {
         throw Util::runtimeError(expr->paren, "Can only call functions and classes.");
     }
 
+
+    LoxCallable* func = (LoxCallable*) callee;
+
     
 
     std::vector<rv> arguments;
@@ -250,33 +200,11 @@ rv Interpreter::visit(Callvp expr) {
         arguments.push_back(evaluate(argument));
     }
 
-    LoxCallable* func;
-
-
-    if (Util::isCallable(callee)){
-        if (isClassMethod(callee)){
-            // todo: figure out a way to get instance key here
-            // we can just call bind here 
-            stringstream ss(callee);
-            string className, methodName, instanceKey;
-            ss >> className >> className >> methodName >> instanceKey;
-
-            
-            func = environment->getClassMethod(callee);
-            func = ((LoxFunction*) func)->bind(environment->getInstance(instanceKey));
-        } else {
-            func = environment->getCallable(callee);
-        }
-    } else {
-        // is class
-        func = environment->getClass(callee);
-    }
-
 
     if (arguments.size() != func->arity()) {
         throw Util::runtimeError(expr->paren, "Expected " +
-            (func->arity()) + " arguments but got " +
-            (arguments.size()) + ".");
+            std::to_string(func->arity()) + " arguments but got " +
+            std::to_string(arguments.size()) + ".");
     }
     return func->call(this, arguments);
 }
@@ -284,7 +212,7 @@ rv Interpreter::visit(Callvp expr) {
 rv Interpreter::visit(Getvp expr) {
     rv object = evaluate(expr->object);
     if (Util::isInstance(object)) {
-        return environment->getInstance(object)->get(expr->name);
+        return ((LoxInstance*) object)->get(expr->name);
     }
 
     throw Util::runtimeError(expr->name,
@@ -317,75 +245,67 @@ rv Interpreter::visit(Assignvp expr){
     return value;
 }
 
-rv Interpreter::visit(Expressionvp stmt){
-    return evaluate(stmt->expression);
+stmt_rv Interpreter::visit(Expressionvp stmt){
+    evaluate(stmt->expression);
 }
 
-rv Interpreter::visit(Functionvp stmt){
-    // TODO: create a combination key for functions st
+stmt_rv Interpreter::visit(Functionvp stmt){
     LoxCallable* func = new LoxFunction(stmt, environment, false);
-    environment->defineFunc(stmt->name.lexeme, func); // come up with our solution for this
-    return nullptr;
+    environment->define(stmt->name.lexeme, func); // come up with our solution for this
 }
 
-rv Interpreter::visit(Ifvp stmt) {
+stmt_rv Interpreter::visit(Ifvp stmt) {
     if (Util::isTruthy(evaluate(stmt->condition))) {
         execute(stmt->thenBranch);
     } else if (stmt->elseBranch != nullptr) {
         execute(stmt->elseBranch);
     }
-    return nullptr;
 }
 
-rv Interpreter::visit(Printvp stmt){
+stmt_rv Interpreter::visit(Printvp stmt){
     rv value = evaluate(stmt->expression);
-    if (Util::isClass(value)){
-        std::cout << ((LoxClass*) value)->toString() << endl;
-        return nullptr;
-    } else if (Util::isInstance(value)){
-        std::cout << ((LoxInstance*) value)->toString() << endl;
-        return nullptr;
-    } else if (Util::isStringLiteral(value)){
-        std::cout <<  << endl; //trim quotes
-        return nullptr;
+    switch (value->getType()){
+        case LOX_CLASS:
+            std::cout << ((LoxClass*) value)->toString() << endl;
+            break;
+        case LOX_INSTANCE:
+            std::cout << ((LoxInstance*) value)->toString() << endl;
+            break;
+        default:
+            std::cout << value << endl;
+            break;
     }
-    // TODO: add else-if for double as well
-    std::cout << value << endl;
-    return nullptr;
 }
 
-rv Interpreter::visit(Returnvp stmt) {
-    rv value = "nil";
+stmt_rv Interpreter::visit(Returnvp stmt) {
+    rv value = nullptr;
     if (stmt->value != nullptr) value = evaluate(stmt->value);
 
     throw ReturnException(value);
 }
 
-rv Interpreter::visit(Varvp stmt){
-    string value = "";
+stmt_rv Interpreter::visit(Varvp stmt){
+    rv value = nullptr;
     if (stmt->initializer != nullptr){
         value = evaluate(stmt->initializer);
     }
 
     environment->define(stmt->name.lexeme, value);
-    return value;
 }
 
-rv Interpreter::visit(Whilevp stmt) {
+stmt_rv Interpreter::visit(Whilevp stmt) {
     while (Util::isTruthy(evaluate(stmt->condition))) {
         execute(stmt->body);
     }
-    return nullptr;
 }
 
-rv Interpreter::visit(Blockvp stmt) {
+stmt_rv Interpreter::visit(Blockvp stmt) {
     Environment* newEnv = new Environment(environment); 
     executeBlock(stmt->statements, newEnv);
-    return nullptr;
 }
 
-rv Interpreter::visit(Classvp stmt) {
-    rv superclass = null;
+stmt_rv Interpreter::visit(Classvp stmt) {
+    rv superclass = nullptr;
     if (stmt->superclass != nullptr) {
         superclass = evaluate(stmt->superclass);
         if (!Util::isClass(superclass)) {
@@ -396,7 +316,7 @@ rv Interpreter::visit(Classvp stmt) {
         }
     }
 
-    environment->define(stmt->name.lexeme, null);
+    environment->define(stmt->name.lexeme, nullptr);
 
     if (stmt->superclass != nullptr) {
         environment = new Environment(environment);
@@ -409,16 +329,13 @@ rv Interpreter::visit(Classvp stmt) {
         methods[method->name.lexeme] =  function;
     }
 
-    LoxClass* superclassPtr = superclass == null ? nullptr : environment->getClass(superclass);
+    LoxClass* klass = new LoxClass(stmt->name.lexeme, ((LoxClass*) superclass), methods);
 
-    LoxClass* klass = new LoxClass(stmt->name.lexeme, superclassPtr, methods);
-
-    if (superclass != null) {
+    if (superclass != nullptr) {
       environment = environment->enclosing;
     }
 
-    environment->addClass(stmt->name.lexeme, klass); 
-    return null;
+    environment->define(stmt->name.lexeme, klass); 
 }
 
 rv Interpreter::visit(Thisvp expr) {
@@ -428,20 +345,17 @@ rv Interpreter::visit(Thisvp expr) {
 
 rv Interpreter::visit(Supervp expr) {
     int distance = locals[expr];
-    LoxClass* superclass = environment->getClass(environment->getAt(
-        distance, "super"));
+    LoxClass* superclass = (LoxClass*) environment->getAt(
+        distance, "super");
 
-    LoxInstance* object = environment->getInstance(environment->getAt(
-        distance - 1, "this"));
+    LoxInstance* object = (LoxInstance*) environment->getAt(
+        distance - 1, "this");
 
-    rv method_key = superclass->findMethod(expr->method.lexeme);
-    if (method_key == null) {
+    LoxFunction* method = superclass->findMethod(expr->method.lexeme);
+    if (method == nullptr) {
       throw Util::runtimeError(expr->method,
           "Undefined property '" + expr->method.lexeme + "'.");
     }
 
-    stringstream ss;
-    ss << method_key << " (instance)" << object; 
-    // return key containing class key, method key and instance key
-    return ss.str();
+    return method->bind(object);
 }

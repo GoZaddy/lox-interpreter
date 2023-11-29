@@ -7,18 +7,18 @@
 
 using namespace std;
 
-template <typename T>
+template <typename T, typename P>
 class Stmt;
 
 template <typename T, typename P>
 class StmtVisitor;
 
 
-template <typename T>
+template <typename T, typename P>
 class Block;
 
 
-template <typename T>
+template <typename T, typename P>
 class Class;
 
 
@@ -26,7 +26,7 @@ template <typename T, typename P>
 class Expression;
 
 
-template <typename T>
+template <typename T, typename P>
 class Function;
 
 
@@ -50,15 +50,15 @@ template <typename T, typename P>
 class While;
 
 
-template <typename T>
-class Block: public Stmt<T> {
+template <typename T, typename P>
+class Block: public Stmt<T,P> {
 	public:
-		std::vector<Stmt<T>*> statements;
-		Block(std::vector<Stmt<T>*> statements) {
+		std::vector<Stmt<T,P>*> statements;
+		Block(std::vector<Stmt<T,P>*> statements) {
 			this->statements = statements;
 		}
 
-		T accept(StmtVisitor<T>* visitor) {
+		T accept(StmtVisitor<T,P>* visitor) {
 			return visitor->visit(this);
 		}
 
@@ -67,19 +67,19 @@ class Block: public Stmt<T> {
 		}
 };
 
-template <typename T>
-class Class: public Stmt<T> {
+template <typename T, typename P>
+class Class: public Stmt<T,P> {
 	public:
 		Token name;
-		Variable<T>* superclass;
-		std::vector<Function<T>*> methods;
-		Class(Token name, Variable<T>* superclass, std::vector<Function<T>*> methods) {
+		Variable<P>* superclass;
+		std::vector<Function<T,P>*> methods;
+		Class(Token name, Variable<P>* superclass, std::vector<Function<T,P>*> methods) {
 			this->name = name;
 			this->superclass = superclass;
 			this->methods = methods;
 		}
 
-		T accept(StmtVisitor<T>* visitor) {
+		T accept(StmtVisitor<T,P>* visitor) {
 			return visitor->visit(this);
 		}
 
@@ -89,14 +89,14 @@ class Class: public Stmt<T> {
 };
 
 template <typename T, typename P>
-class Expression: public Stmt<T> {
+class Expression: public Stmt<T,P> {
 	public:
 		Expr<P>* expression;
 		Expression(Expr<P>* expression) {
 			this->expression = expression;
 		}
 
-		T accept(StmtVisitor<T>* visitor) {
+		T accept(StmtVisitor<T,P>* visitor) {
 			return visitor->visit(this);
 		}
 
@@ -105,19 +105,19 @@ class Expression: public Stmt<T> {
 		}
 };
 
-template <typename T>
-class Function: public Stmt<T> {
+template <typename T, typename P>
+class Function: public Stmt<T,P> {
 	public:
 		Token name;
 		std::vector<Token> params;
-		std::vector<Stmt<T>*> body;
-		Function(Token name, std::vector<Token> params, std::vector<Stmt<T>*> body) {
+		std::vector<Stmt<T,P>*> body;
+		Function(Token name, std::vector<Token> params, std::vector<Stmt<T,P>*> body) {
 			this->name = name;
 			this->params = params;
 			this->body = body;
 		}
 
-		T accept(StmtVisitor<T>* visitor) {
+		T accept(StmtVisitor<T,P>* visitor) {
 			return visitor->visit(this);
 		}
 
@@ -127,18 +127,18 @@ class Function: public Stmt<T> {
 };
 
 template <typename T, typename P>
-class If: public Stmt<T> {
+class If: public Stmt<T,P> {
 	public:
 		Expr<P>* condition;
-		Stmt<T>* thenBranch;
-		Stmt<T>* elseBranch;
-		If(Expr<P>* condition, Stmt<T>* thenBranch, Stmt<T>* elseBranch) {
+		Stmt<T,P>* thenBranch;
+		Stmt<T,P>* elseBranch;
+		If(Expr<P>* condition, Stmt<T,P>* thenBranch, Stmt<T,P>* elseBranch) {
 			this->condition = condition;
 			this->thenBranch = thenBranch;
 			this->elseBranch = elseBranch;
 		}
 
-		T accept(StmtVisitor<T>* visitor) {
+		T accept(StmtVisitor<T,P>* visitor) {
 			return visitor->visit(this);
 		}
 
@@ -148,14 +148,14 @@ class If: public Stmt<T> {
 };
 
 template <typename T, typename P>
-class Print: public Stmt<T> {
+class Print: public Stmt<T,P> {
 	public:
 		Expr<P>* expression;
 		Print(Expr<P>* expression) {
 			this->expression = expression;
 		}
 
-		T accept(StmtVisitor<T>* visitor) {
+		T accept(StmtVisitor<T,P>* visitor) {
 			return visitor->visit(this);
 		}
 
@@ -165,7 +165,7 @@ class Print: public Stmt<T> {
 };
 
 template <typename T, typename P>
-class Return: public Stmt<T> {
+class Return: public Stmt<T,P> {
 	public:
 		Token keyword;
 		Expr<P>* value;
@@ -174,7 +174,7 @@ class Return: public Stmt<T> {
 			this->value = value;
 		}
 
-		T accept(StmtVisitor<T>* visitor) {
+		T accept(StmtVisitor<T,P>* visitor) {
 			return visitor->visit(this);
 		}
 
@@ -184,7 +184,7 @@ class Return: public Stmt<T> {
 };
 
 template <typename T, typename P>
-class Var: public Stmt<T> {
+class Var: public Stmt<T,P> {
 	public:
 		Token name;
 		Expr<P>* initializer;
@@ -193,7 +193,7 @@ class Var: public Stmt<T> {
 			this->initializer = initializer;
 		}
 
-		T accept(StmtVisitor<T>* visitor) {
+		T accept(StmtVisitor<T,P>* visitor) {
 			return visitor->visit(this);
 		}
 
@@ -203,16 +203,16 @@ class Var: public Stmt<T> {
 };
 
 template <typename T, typename P>
-class While: public Stmt<T> {
+class While: public Stmt<T,P> {
 	public:
 		Expr<P>* condition;
-		Stmt<T>* body;
-		While(Expr<P>* condition, Stmt<T>* body) {
+		Stmt<T,P>* body;
+		While(Expr<P>* condition, Stmt<T,P>* body) {
 			this->condition = condition;
 			this->body = body;
 		}
 
-		T accept(StmtVisitor<T>* visitor) {
+		T accept(StmtVisitor<T,P>* visitor) {
 			return visitor->visit(this);
 		}
 
@@ -225,10 +225,10 @@ class While: public Stmt<T> {
 template <typename T, typename P>
 class StmtVisitor {
 	public:
-		virtual T visit(Block<T>* stmt) = 0;
-		virtual T visit(Class<T>* stmt) = 0;
-		virtual T visit(Expression<T, P>* stmt) = 0;
-		virtual T visit(Function<T>* stmt) = 0;
+		virtual T visit(Block<T,P>* stmt) = 0;
+		virtual T visit(Class<T,P>* stmt) = 0;
+		virtual T visit(Expression<T,P>* stmt) = 0;
+		virtual T visit(Function<T,P>* stmt) = 0;
 		virtual T visit(If<T, P>* stmt) = 0;
 		virtual T visit(Print<T,P>* stmt) = 0;
 		virtual T visit(Return<T,P>* stmt) = 0;
@@ -236,10 +236,10 @@ class StmtVisitor {
 		virtual T visit(While<T,P>* stmt) = 0;
 };
 
-template <typename T>
+template <typename T, typename P>
 class Stmt {
 	public:
-		virtual T accept(StmtVisitor<T>* visitor) = 0;
+		virtual T accept(StmtVisitor<T,P>* visitor) = 0;
 		virtual string getType() = 0;
 };
 

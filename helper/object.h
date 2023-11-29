@@ -11,8 +11,8 @@
     } while (false)
 
 enum Type {
-    STRING,
-    DOUBLE,
+    STRING_T,
+    DOUBLE_T,
     BOOLEAN,
     LOX_CALLABLE,
     LOX_CLASS,
@@ -87,7 +87,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Boolean& str);
 };
 
-Object* True = new Boolean(true);
-Object* False = new Boolean(false);
+extern Object* True = new Boolean(true);
+extern Object* False = new Boolean(false);
 
 #endif // OBJECT_H

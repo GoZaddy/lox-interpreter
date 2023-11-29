@@ -41,7 +41,7 @@ vector<Token> Scanner::scanTokens() {
     }
 
 
-    tokens.push_back(Token(END_OF_FILE, "", "", line));
+    tokens.push_back(Token(END_OF_FILE, "", nullptr, line));
 
     return tokens;
 };
@@ -55,10 +55,10 @@ char Scanner::advance() {
 }
 
 void Scanner::addToken(TokenType type) {
-    addToken(type, "");
+    addToken(type, nullptr);
 }
 
-void Scanner::addToken(TokenType type, string literal) {
+void Scanner::addToken(TokenType type, rv literal) {
     string text = source.substr(start, current-start);
     Token t(type, text, literal, line);
     tokens.push_back(t);
@@ -107,8 +107,8 @@ void Scanner::stringFunc() {
     advance();
 
     // Trim the surrounding quotes.
-    string val = source.substr(start, current - start);
-    addToken(STRING, val);
+    string val = source.substr(start+1, current - start-2); // TODO: might not be right
+    addToken(STRING, new String(val));
 }
 
 
@@ -127,7 +127,7 @@ void Scanner::number(){
 
     addToken(
             NUMBER,
-            source.substr(start, current-start)
+            new Double(std::stod(source.substr(start, current-start)))
     );
 }
 

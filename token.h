@@ -2,6 +2,7 @@
 #define TOKEN_H
 
 #include <string>
+#include "helper/object.h"
 
 
 
@@ -28,15 +29,15 @@ enum TokenType {
 
 
 class Token {
-    public:
-        TokenType type;
-        std::string lexeme;
-        std::string literal;
-        int line;
+  public:
+      TokenType type;
+      std::string lexeme;
+      Object* literal;
+      int line;
 
-        Token(TokenType type, std::string lexeme, std::string literal, int line);
-        Token() = default;
-        std::string toString();
+      Token(TokenType type, std::string lexeme, Object* literal, int line);
+      Token() = default;
+      std::string toString();
 };
 
 #endif

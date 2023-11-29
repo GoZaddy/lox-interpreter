@@ -146,7 +146,7 @@ class Parser {
 
 
             if (condition == nullptr){
-                condition = new Litv("true");
+                condition = new Litv(True);
             }
             body = new Whilev(condition, body);
 
@@ -410,19 +410,19 @@ class Parser {
         Exprvp primary(){
             Exprvp res;
             if (match({FALSE})) {
-                Litv* temp = new Litv("false");
+                Litv* temp = new Litv(False);
                 res = temp;
                 return res;
             }
 
             if (match({TRUE})) {
-                Litv* temp = new Litv("true");
+                Litv* temp = new Litv(True);
                 res = temp;
                 return res;
             }
 
             if (match({NIL})) {
-                Litv* temp = new Litv("nil");
+                Litv* temp = new Litv(nullptr);
                 res = temp;
                 return res;
             }
@@ -433,6 +433,7 @@ class Parser {
 
                 return res;
             }
+
 
             if (match({SUPER})) {
                 Token keyword = previous();

@@ -1,0 +1,60 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"jsonFile" : "directory-.-Debug-f5ebdc15457944623624.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.26"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "lox_interpreter",
+					"targetIndexes" : 
+					[
+						0
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "lox_interpreter::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-lox_interpreter-Debug-0794b64766ddab002e4a.json",
+					"name" : "lox_interpreter",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "/Users/faruqyusuff/Desktop/cs 403/lox-interpreter/cmake-build-debug",
+		"source" : "/Users/faruqyusuff/Desktop/cs 403/lox-interpreter"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 5
+	}
+}

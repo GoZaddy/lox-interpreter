@@ -10,6 +10,7 @@
 #include <unordered_map>
 
 #include "token.h"
+#include "types.h"
 
 using namespace std; // todo: remove - bad practice
 
@@ -34,7 +35,7 @@ class Scanner {
 
         void addToken(TokenType type);
 
-        void addToken(TokenType type, string literal);
+        void addToken(TokenType type, rv literal);
 
         bool isAlpha(char c);
 

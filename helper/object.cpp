@@ -3,7 +3,7 @@
 String::String(const std::string val) : value(val) {}
 
 Type String::getType() const {
-    return STRING;
+    return STRING_T;
 }
 
 std::string String::getValue() const {
@@ -29,7 +29,7 @@ std::ostream& operator<<(std::ostream& os, const String& input) {
 Double::Double(double val) : value(val) {}
 
 Type Double::getType() const {
-    return DOUBLE;
+    return DOUBLE_T;
 }
 
 double Double::getValue() const {
