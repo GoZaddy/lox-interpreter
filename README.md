@@ -1,4 +1,4 @@
-# Yisp Interpreter
+# Lox Interpreter
 
 ##  Building executable for interpreter
 
