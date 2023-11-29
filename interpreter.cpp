@@ -162,7 +162,7 @@ rv Interpreter::visit(Setvp expr) {
     }
 
     rv value = evaluate(expr->value);
-    (environment->getInstance(object))->set(expr->name, value);
+    ((LoxInstance*)(environment->get(expr->name)))->set(expr->name, value);
     return value;
   }
 
@@ -340,17 +340,18 @@ rv Interpreter::visit(Ifvp stmt) {
 rv Interpreter::visit(Printvp stmt){
     rv value = evaluate(stmt->expression);
     if (Util::isClass(value)){
-        std::cout << environment->getClass(value)->toString() << endl;
-        return null;
+        std::cout << ((LoxClass*) value)->toString() << endl;
+        return nullptr;
     } else if (Util::isInstance(value)){
-        std::cout << environment->getInstance(value)->toString() << endl;
-        return null;
+        std::cout << ((LoxInstance*) value)->toString() << endl;
+        return nullptr;
     } else if (Util::isStringLiteral(value)){
-        std::cout << value.substr(1,value.size()-2) << endl; //trim quotes
-        return null;
+        std::cout <<  << endl; //trim quotes
+        return nullptr;
     }
+    // TODO: add else-if for double as well
     std::cout << value << endl;
-    return null;
+    return nullptr;
 }
 
 rv Interpreter::visit(Returnvp stmt) {
