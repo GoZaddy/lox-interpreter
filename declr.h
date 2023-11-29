@@ -44,9 +44,9 @@ class LoxFunction: public LoxCallable{
 
         LoxFunction* bind(LoxInstance* instance);
 
-        rv call(Interpreter* interpreter, std::vector<rv> arguments);
+        rv call(Interpreter* interpreter, std::vector<rv> arguments) override;
 
-        int arity();
+        int arity() override;
 
         std::string toString();
 
@@ -254,11 +254,11 @@ class LoxClass: public LoxCallable{
 
         std::string toString();
 
-        rv call(Interpreter* interpreter, std::vector<rv> arguments);
+        rv call(Interpreter* interpreter, std::vector<rv> arguments) override;
 
         LoxFunction* findMethod(string name);
 
-        int arity();
+        int arity() override;
 
         Type getType() const override;
 };

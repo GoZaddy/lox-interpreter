@@ -1,3 +1,5 @@
+// Test passes!
+
 fun greeting(salutation){
     fun result(name){
         return salutation + name;
@@ -8,4 +10,7 @@ fun greeting(salutation){
 
 var greet = greeting("Hey! ");
 print greet("Faruq Yusuff");
+
+// Expected output:
+// Hey! Faruq Yusuff
 

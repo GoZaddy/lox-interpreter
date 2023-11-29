@@ -13,6 +13,6 @@ var foo = Foo();
 foo.assign();
 print foo.name;
 
-// The output should be:
+// Expected output:
 // "call init method"
 // "FooTest"

@@ -100,7 +100,6 @@ rv Interpreter::visit(Setvp expr) {
     
     rv object = evaluate(expr->object);
 
-
     if (!Util::isInstance(object)) { 
         throw Util::runtimeError(
             expr->name,
@@ -109,7 +108,7 @@ rv Interpreter::visit(Setvp expr) {
     }
 
     rv value = evaluate(expr->value);
-    ((LoxInstance*)(environment->get(expr->name)))->set(expr->name, value);
+    ((LoxInstance*) object)->set(expr->name, value);
     return value;
   }
 

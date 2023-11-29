@@ -13,6 +13,6 @@ var a = "global";
 }
 
 
-// The output should be:
+// Expected output:
 // global
 // global

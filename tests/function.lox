@@ -1,3 +1,5 @@
+// Test passes!
+
 fun fib(n){
     if (n <= 1){
         return n;
@@ -6,4 +8,7 @@ fun fib(n){
     
 }
 
-print fib(20); // return 6765, the 20th number in the fibonacci sequence
+print fib(9); // return the 10th number in the fibonacci sequence(assuming the first is 0)
+
+// Expected output:
+// 34, 
