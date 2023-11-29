@@ -34,7 +34,7 @@ g++ -std=c++11 helper/object.cpp main.cpp scanner.cpp token.cpp util.cpp parser.
 
 ## Testing
 
-In the tests/ directory, you will find a variety of tests to test the different parts of the interpreter. Each test has been verified to pass but you can run them to confirm the results. To run a test:
+In the tests/ directory, you will find a variety of tests to test the different parts of the interpreter. Each test has been verified to pass but you can run them to confirm the results. To test a sample lox file named inheritance.lox:
 
 For windows:
 ```
