@@ -11,7 +11,6 @@
 
 #include "declr.h"
 
-using namespace std;
 
 bool Util::hadError = false;
 bool Util::hadRuntimeError = false;
@@ -21,7 +20,7 @@ Interpreter interpreter;
 void run(string source){
     // get tokens
     Scanner scanner(source);
-    vector<Token> tokens = scanner.scanTokens();
+    std::vector<Token> tokens = scanner.scanTokens();
 
     // // For now, just print the tokens.
     // for (Token token : tokens) {
@@ -31,7 +30,7 @@ void run(string source){
 
     Parser parser(tokens);
 
-    vector<Stmtvp> statements = parser.parse();
+    std::vector<Stmtvp> statements = parser.parse();
     
     // Exprvp value = new Litv("true");
     // Stmtvp stmt = new Printv(value);
@@ -77,9 +76,9 @@ int runFile(string path){
 
 void runPrompt(){
     string line = "";
-    while(!cin.eof()){
-        cout << "> " << endl;
-        getline(cin, line);
+    while(!std::cin.eof()){
+        std::cout << "> " << endl;
+        getline(std::cin, line);
 
         run(line);
         Util::hadError = false;

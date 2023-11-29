@@ -4,7 +4,7 @@
 #include "stmt.cpp"
 #include "expr.cpp"
 #include <variant>
-#include "helper/object.cpp"
+#include "helper/object.h"
 
 
 

@@ -87,7 +87,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Boolean& str);
 };
 
-extern Object* True = new Boolean(true);
-extern Object* False = new Boolean(false);
+extern Object* True;
+extern Object* False;
 
 #endif // OBJECT_H

@@ -46,6 +46,6 @@ int LoxClass::arity(){
     return methods["init"]->arity();
 }
 
-Type LoxClass::getType() const {
+Type LoxClass::getType() const{
     return LOX_CLASS;
 }

@@ -271,6 +271,15 @@ stmt_rv Interpreter::visit(Printvp stmt){
         case LOX_INSTANCE:
             std::cout << ((LoxInstance*) value)->toString() << endl;
             break;
+        case BOOLEAN:
+            std::cout << ((Boolean*) value)->getValue() << endl;
+            break;
+        case STRING_T:
+            std::cout << ((String*) value)->getValue() << endl;
+            break;
+        case DOUBLE_T:
+            std::cout << ((Double*) value)->getValue() << endl;
+            break;
         default:
             std::cout << value << endl;
             break;

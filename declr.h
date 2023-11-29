@@ -27,9 +27,6 @@ class LoxCallable: public Object{
         virtual Type getType() const;
 };
 
-Type LoxCallable::getType() const{
-    return LOX_CALLABLE;
-}
 
 
 
@@ -53,7 +50,7 @@ class LoxFunction: public LoxCallable{
 
         std::string toString();
 
-        Type getType() const;
+        Type getType() const override;
 };
 
 
@@ -263,7 +260,7 @@ class LoxClass: public LoxCallable{
 
         int arity();
 
-        Type getType() const;
+        Type getType() const override;
 };
 
 
@@ -292,7 +289,7 @@ class LoxInstance: public Object {
 
         std::string toString();
 
-        Type getType() const;
+        Type getType() const override;
 };
 
 

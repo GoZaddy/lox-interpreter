@@ -1,5 +1,8 @@
 #include "object.h"
 
+Object* True = new Boolean(true);
+Object* False = new Boolean(false);
+
 String::String(const std::string val) : value(val) {}
 
 Type String::getType() const {
