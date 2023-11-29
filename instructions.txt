@@ -1,6 +1,0 @@
-Our book builds a complete interpreter for the Lox language in Java.
-
-Follow along in the language of your choice (not java).
-
-Submit affter each chapter (more or less, I don't plan to count exactly, but I want early middle and late progress) to show progress/progression.
-
