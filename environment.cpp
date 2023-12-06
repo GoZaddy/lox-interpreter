@@ -4,68 +4,6 @@
 #include "declr.h"
 
 
-/**
- * 
- * keys
- * ()func_name => regular function
- * (instance)pointer_value => LoxInstance
- * (class)class_name => Class
- * (.)
-*/
-
-
-
-// LoxCallable* Environment::getCallable(string key){
-//     if (funcMap.find(key) != funcMap.end()){
-//         return funcMap[key];
-//     }
-
-//     if (enclosing != nullptr) return enclosing->getCallable(key);
-
-//     std::cerr << "internal error: invalid callable key" << key << endl;
-//     return nullptr;
-// }
-
-// LoxCallable* Environment::getClassMethod(string key){
-//     // format for class method key => (.) class_key methodName
-//     stringstream ss(key);
-//     string classKey, methodName;
-//     ss >> classKey >> classKey >> methodName;
-    
-//     LoxClass* klass = getClass(classKey);
-
-//     if (klass->methods.find(methodName) != klass->methods.end()){
-//         return klass->methods[methodName];
-//     }
-
-//     std::cerr << "internal error: invalid class method key" << key << endl;
-//     return nullptr;
-// }
-
-
-// LoxClass* Environment::getClass(string key){
-//     if (classMap.find(key) != classMap.end()){
-//         return classMap[key];
-//     }
-
-//     if (enclosing != nullptr) return enclosing->getClass(key);
-
-//     std::cerr << "internal error: invalid class key" << key << endl;
-//     return nullptr;
-// }
-
-
-// LoxInstance* Environment::getInstance(string key){
-//     if (instanceMap.find(key) != instanceMap.end()){
-//         return instanceMap[key];
-//     }
-
-//     if (enclosing != nullptr) return enclosing->getInstance(key);
-
-//     std::cerr << "internal error: invalid class instance key" << key << endl;
-//     return nullptr;
-// }
-
 Environment::Environment(std::string environmentKey){
     enclosing = nullptr;
     this->environmentKey = environmentKey;
@@ -81,10 +19,6 @@ void Environment::define(string name, rv value){
     this->values[name] = value;
 }
 
-// void Environment::defineFunc(string name, LoxCallable* func){
-//     define(name, "()"+name);  // TODO: we should probably implement recursive assign as in assign()
-//     funcMap["()"+name] = func;
-// }
 
 rv Environment::get(Token name){
     if (values.find(name.lexeme) != values.end()){
@@ -132,21 +66,3 @@ void Environment::assign(Token name, rv value) {
     throw Util::runtimeError(name,
         "Undefined variable '" + name.lexeme + "'.");
 }
-
-
-// void Environment::addClass(string name, LoxClass* klass){
-//     string key = "(class)"+name;
-//     define(name, key);  // TODO: we should probably implement recursive assign as in assign()
-//     classMap[key] = klass;
-// }
-
-// string Environment::addInstance(LoxInstance* instance){
-//     stringstream ss;
-//     ss << "(instance)" << instance;
-
-//     instanceMap[ss.str()] = instance;
-
-//     return ss.str();
-// }
-
-

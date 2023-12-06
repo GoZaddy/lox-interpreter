@@ -8,12 +8,6 @@
 #define GET_STRING(x) Util::GetString(x)
 
 
-// Looking back, I probably could have created helper classes similar to Stmt and Expr or even somehow
-// used both those classes to represent the return type of these evaluate() expressions
-// i.e create a pure virtual class that expr and stmt derive from and use a pointer
-// to that virtual class as the return type for the evaluate function. We can then cast that type as we 
-// need to more specific types
-
 rv Interpreter::evaluate(Exprvp expr){
     rv value = expr->accept(this);
     // delete expr; // TODO: test this out
@@ -271,7 +265,7 @@ stmt_rv Interpreter::visit(Printvp stmt){
             std::cout << ((LoxInstance*) value)->toString() << endl;
             break;
         case BOOLEAN:
-            std::cout << ((Boolean*) value)->getValue() << endl;
+            std::cout << (((Boolean*) value)->getValue() ? "true" : "false") << endl;
             break;
         case STRING_T:
             std::cout << ((String*) value)->getValue() << endl;

@@ -1,0 +1,23 @@
+// Test passes!
+
+
+print(false == nil);
+print(1 == 1);
+print (2 > 1);
+print(1 > 2);
+print(1 >= 1);
+print("hey" != "hi");
+print("hey" == "hey");
+
+var hey = "hi";
+print(hey != "hey");
+
+// Expected output:
+// false
+// true
+// true
+// false
+// true
+// true
+// true
+// true

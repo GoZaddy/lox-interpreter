@@ -27,9 +27,11 @@ chmod +x compile.sh
 ### Windows
 - Run in the terminal:
 ```
-g++ -std=c++11 helper/object.cpp main.cpp scanner.cpp token.cpp util.cpp parser.cpp expr.cpp stmt.cpp interpreter.cpp return.cpp lox_function.cpp native_funcs.cpp environment.cpp resolver.cpp lox_class.cpp lox_instance.cpp lox_callable.cpp
+g++ -w -std=c++11 helper/object.cpp main.cpp scanner.cpp token.cpp util.cpp parser.cpp expr.cpp stmt.cpp interpreter.cpp return.cpp lox_function.cpp native_funcs.cpp environment.cpp resolver.cpp lox_class.cpp lox_instance.cpp lox_callable.cpp
 
 ```
+
+*Note: Compilation is unusually time-consuming(~10 seconds)*
 
 
 ## Testing

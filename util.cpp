@@ -31,10 +31,12 @@ double Util::doub(std::string input){
 }
 
 bool Util::isNumberLiteral(rv expr){
+    if (expr == nullptr) return false;
     return expr->getType() == DOUBLE_T;
 }
 
 bool Util::isStringLiteral(rv expr){
+    if (expr == nullptr) return false;
     return expr->getType() == STRING_T;
 }
 
@@ -47,6 +49,7 @@ double Util::GetDouble(rv expr){
 }
 
 bool Util::isCallable(rv expr){
+    if (expr == nullptr) return false;
     Type type = expr->getType();
     return type == LOX_FUNCTION || type == LOX_CLASS || type == LOX_CALLABLE;
 }
@@ -54,38 +57,44 @@ bool Util::isCallable(rv expr){
 // bool Util::isClassMethod(rv expr);
 
 bool Util::isClass(rv expr){
+    if (expr == nullptr) return false;
     return expr->getType() == LOX_CLASS;
 }
 
 bool Util::isInstance(rv expr){
+    if (expr == nullptr) return false;
     return expr->getType() == LOX_INSTANCE;
 }
 
 bool Util::isEqual(rv a, rv b){
+    if (a == nullptr || b == nullptr) return false;
+
     Type typeA = a->getType();
     Type typeB = b->getType();
+
+
 
     if (typeA != typeB){
         return false;
     }
 
     if (typeA == STRING_T){
-        return ((String*) a) == ((String*) b);
+        return (GetString(a) == GetString(b));
     }
 
     if (typeA == DOUBLE_T){
-        return ((Double*) a) == ((Double*) b);
+        return (GetDouble(a) == GetDouble(b));
     }
 
     if (typeA == BOOLEAN){
-        return ((Boolean*) a) == ((Boolean*) b);
+        return ((Boolean*) a)->getValue() == ((Boolean*) b)->getValue();
     }
 
     return a == b;
 }
 
 bool Util::isTruthy(rv object){
-    if (object == nullptr) return false; // TODO: what other values could return false
+    if (object == nullptr) return false;
     if (object->getType() == BOOLEAN){
         return ((Boolean*) object)->getValue();
     }
