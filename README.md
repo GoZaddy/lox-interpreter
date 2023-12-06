@@ -32,3 +32,4 @@ g++ -w -std=c++11 main.cpp scanner.cpp token.cpp util.cpp parser.cpp interpreter
 ```
 
 *Note: Compilation can be unusually slow(~10 seconds)*
+
