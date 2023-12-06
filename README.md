@@ -1,12 +1,34 @@
-# Chapter 6
-maybe write note here
+# Lox Interpreter
 
-# Run instructions
+##  Building executable for interpreter
+
+- Make sure you're in the root directory of the project
+- Make sure you have g++ compiler installed
+
+If you're not sure:
+Run `g++ --version` in command line to find out. You should get something like this:
 ```
-g++ -std=c++11 main.cpp scanner.cpp token.cpp util.cpp ast_printer.cpp parser.cpp
+g++.exe (x86_64-posix-seh, Built by strawberryperl.com project) 8.3.0
+Copyright (C) 2018 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
 
-# Potential issues
-- In c++, I have to make use of pointers to take advantage of the visitor pattern(this is because C++ doesn't support interfaces as a distinct construct, instead I have to use an abstract class which requires pointers). Since, I have to create pointers to represent each expression, the interpreter will be creating lots of pointers which means we could theoretically run out of memory very quickly.
+### Linux/Mac
+- First make the shell script executable
+```
+chmod +x compile.sh
+```
+- Run the script to compile the source code
+```
+./compile.sh
+```
 
-Haven't really thought of a solution but I think instead of returning Exprv from my parsing functions, I could processing certain expressions as soon as possible and free the pointers, returning the results of the processing instead of the actual pointers themselves
+### Windows
+- Run in the terminal:
+```
+g++ -w -std=c++11 main.cpp scanner.cpp token.cpp util.cpp ast_printer.cpp parser.cpp
+
+```
+
+*Note: Compilation can be unusually slow(~10 seconds)*
