@@ -1,13 +1,33 @@
-# Chapter 8
-I had to use the visitor pattern to get a "type" for each expression subclass since c++ doesn't support an non-tedious equivalent of java's `instanceof`
-# Run instructions
+# Lox Interpreter
+
+##  Building executable for interpreter
+
+- Make sure you're in the root directory of the project
+- Make sure you have g++ compiler installed
+
+If you're not sure:
+Run `g++ --version` in command line to find out. You should get something like this:
 ```
-g++ -std=c++11 main.cpp scanner.cpp token.cpp util.cpp parser.cpp interpreter.cpp
+g++.exe (x86_64-posix-seh, Built by strawberryperl.com project) 8.3.0
+Copyright (C) 2018 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ```
 
-To run AST (Abstract Syntax Tool) generator tool:
+### Linux/Mac
+- First make the shell script executable
 ```
-g++ -std=c++11 tool/GenerateAst.cpp
+chmod +x compile.sh
+```
+- Run the script to compile the source code
+```
+./compile.sh
 ```
 
-# What we learned
+### Windows
+- Run in the terminal:
+```
+g++ -w -std=c++11 main.cpp expr.cpp stmt.cpp scanner.cpp token.cpp util.cpp parser.cpp interpreter.cpp
+```
+
+*Note: Compilation can be unusually slow(~10 seconds)*
